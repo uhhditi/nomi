@@ -6,42 +6,52 @@ import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 
-export default function LoginScreen() {
+export default function SignupScreen() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
 
     type RootStackParamList = {
         Home: undefined;
         Login: undefined;
+        Signup: undefined;
       };
       
       const Stack = createNativeStackNavigator<RootStackParamList>();
-      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
+      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
 
   
-    async function handleLogin() {
+    async function handleSignup() {
         // 1. Call backend API with user credentials
         const response = await fetch('', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ name, email, username, password }),
         });
-      
-        const data = await response.json();
-      
+
         if (response.ok) {
-          // 2. Save the token
-          await saveToken(data.token);
-          navigation.navigate('Home');
-      
-         
+          console.log("yay")
+          navigation.navigate('Login')
         } else {
-          alert('Login failed');
+          alert('signup failed');
         }
       }
   
     return (
       <View className="flex-1 justify-center p-4">
+        <TextInput
+          placeholder="Name"
+          value={name}
+          onChangeText={setName}
+          className="border p-2 mb-4"
+        />
+        <TextInput
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          className="border p-2 mb-4"
+        />
         <TextInput
           placeholder="UserName"
           value={username}
@@ -55,7 +65,7 @@ export default function LoginScreen() {
           secureTextEntry
           className="border p-2 mb-4"
         />
-        <Button title="Login" onPress={handleLogin} />
+        <Button title="Login" onPress={handleSignup} />
       </View>
     );
   }
