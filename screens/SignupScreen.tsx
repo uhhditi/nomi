@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import "./global.css"
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
