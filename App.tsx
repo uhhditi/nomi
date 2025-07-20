@@ -28,6 +28,7 @@ function HomeScreen() {
 
   //get all logs
   async function fetchLogs() {
+    console.log("fetchLogs called");
     const result = await getLogs();
     console.log("fetched logs:", result);
     setAllLogs(result);

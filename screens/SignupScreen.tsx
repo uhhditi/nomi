@@ -3,11 +3,12 @@ import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { getUser } from '../services/userService';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 export default function SignupScreen() {
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    //const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
 
@@ -21,19 +22,12 @@ export default function SignupScreen() {
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
 
   
-    async function handleSignup() {
-        // 1. Call backend API with user credentials
-        const response = await fetch('', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, username, password }),
-        });
-
-        if (response.ok) {
-          console.log("yay")
-          navigation.navigate('Login')
-        } else {
-          alert('signup failed');
+      async function handleSignup() {
+        try {
+          const data = await getUser(name, email); 
+          console.log(data); 
+        } catch (err) {
+          console.error(err);
         }
       }
   
@@ -51,19 +45,13 @@ export default function SignupScreen() {
           onChangeText={setEmail}
           className="border p-2 mb-4"
         />
-        <TextInput
-          placeholder="UserName"
-          value={username}
-          onChangeText={setUsername}
-          className="border p-2 mb-4"
-        />
-        <TextInput
+        {/* <TextInput
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           className="border p-2 mb-4"
-        />
+        /> */}
         <Button title="Login" onPress={handleSignup} />
       </View>
     );

@@ -3,8 +3,10 @@ import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { IP_ADDRESS } from '@env'
 
 
+//CHANGE TO EMAIL
 export default function LoginScreen() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -20,7 +22,7 @@ export default function LoginScreen() {
   
     async function handleLogin() {
         // 1. Call backend API with user credentials
-        const response = await fetch('', {
+        const response = await fetch(`http://${IP_ADDRESS}:3001/user/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password }),
