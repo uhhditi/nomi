@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -8,15 +7,15 @@ import { IP_ADDRESS } from '@env'
 
 //CHANGE TO EMAIL
 export default function LoginScreen() {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     type RootStackParamList = {
         Home: undefined;
         Login: undefined;
+        Signup: undefined;
       };
       
-      const Stack = createNativeStackNavigator<RootStackParamList>();
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
 
   
@@ -25,7 +24,7 @@ export default function LoginScreen() {
         const response = await fetch(`http://${IP_ADDRESS}:3001/user/`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ email, password }),
         });
       
         const data = await response.json();
@@ -33,7 +32,7 @@ export default function LoginScreen() {
         if (response.ok) {
           // 2. Save the token
           await saveToken(data.token);
-          navigation.navigate('Home');
+          navigation.navigate("Home")
       
          
         } else {
@@ -45,8 +44,8 @@ export default function LoginScreen() {
       <View className="flex-1 justify-center p-4">
         <TextInput
           placeholder="UserName"
-          value={username}
-          onChangeText={setUsername}
+          value={email}
+          onChangeText={setEmail}
           className="border p-2 mb-4"
         />
         <TextInput

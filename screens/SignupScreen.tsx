@@ -3,7 +3,7 @@ import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { getUser } from '../services/userService';
+import { setUser } from '../services/userService';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 export default function SignupScreen() {
@@ -18,17 +18,18 @@ export default function SignupScreen() {
         Signup: undefined;
       };
       
-      const Stack = createNativeStackNavigator<RootStackParamList>();
+      
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
 
   
       async function handleSignup() {
         try {
-          const data = await getUser(name, email); 
+          const data = await setUser(name, email); 
           console.log(data); 
         } catch (err) {
           console.error(err);
         }
+        navigation.navigate("Login");
       }
   
     return (
@@ -52,7 +53,7 @@ export default function SignupScreen() {
           secureTextEntry
           className="border p-2 mb-4"
         /> */}
-        <Button title="Login" onPress={handleSignup} />
+        <Button title="sign up" onPress={handleSignup} />
       </View>
     );
   }
