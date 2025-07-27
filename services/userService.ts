@@ -1,7 +1,6 @@
 import { IP_ADDRESS } from '@env'
-import { useState } from 'react';
-
-
+import { useState, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 export async function setUser(name: string, email: string, password: string) {
     const response = await fetch(`http://${IP_ADDRESS}:3001/user/`, {
@@ -35,9 +34,16 @@ export async function loginUser(email: string, password: string) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({email, password}),
       });
+
       if (!response.ok) {
         throw new Error("invalid login")
       } 
 
+    const data = await response.json();
+    // setAuthState({
+    //   token: data.token,
+    //   authenticated: true
+    // })
+
     return response.json();
-}
+};
