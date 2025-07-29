@@ -7,8 +7,7 @@ import { setUser } from '../services/userService';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 export default function SignupScreen() {
-    const [username, setUsername] = useState('');
-    //const [password, setPassword] = useState('');
+    const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
 
@@ -18,13 +17,13 @@ export default function SignupScreen() {
         Signup: undefined;
       };
       
-      
+
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
 
   
       async function handleSignup() {
         try {
-          const data = await setUser(name, email); 
+          const data = await setUser(name, email, password); 
           console.log(data); 
         } catch (err) {
           console.error(err);
@@ -46,13 +45,13 @@ export default function SignupScreen() {
           onChangeText={setEmail}
           className="border p-2 mb-4"
         />
-        {/* <TextInput
+        <TextInput
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           className="border p-2 mb-4"
-        /> */}
+        />
         <Button title="sign up" onPress={handleSignup} />
       </View>
     );

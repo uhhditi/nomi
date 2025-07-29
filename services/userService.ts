@@ -25,7 +25,8 @@ export async function getUser() {
         alert('user fetch failed');
       }
 
-    return response.json();
+      const json = await response.json();
+      return json;
 }
 
 export async function loginUser(email: string, password: string) {
@@ -45,5 +46,5 @@ export async function loginUser(email: string, password: string) {
     //   authenticated: true
     // })
 
-    return response.json();
+    return data;
 };

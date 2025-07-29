@@ -5,7 +5,7 @@ import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-na
 import { IP_ADDRESS } from '@env'
 
 
-//CHANGE TO EMAIL
+
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
