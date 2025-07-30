@@ -2,6 +2,8 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "types": ["../types/env.d.ts"]
+    "types": ["../types/env.d.ts"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 }
