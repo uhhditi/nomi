@@ -4,33 +4,37 @@ import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IP_ADDRESS } from '@env'
 import React from 'react';
-import { loginUser } from '../services/userService';
 
 
 
-export default function LoginScreen() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+export default function MealScreen() {
+    const [mealDesc, setMealDesc] = useState('');
+    const [foodTags, setFoodTags] = useState('');
+    const [symptomTags, setSymptomTags] = useState('');
 
     type RootStackParamList = {
         Home: undefined;
         Login: undefined;
         Signup: undefined;
+        Meal: undefined;
       };
       
-      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
+      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Meal'>>();
 
   
-    async function handleLogin() {
+    async function handleMeal() {
         // 1. Call backend API with user credentials
-        const response = await loginUser(email, password);
+        const response = await fetch(`http://${IP_ADDRESS}:3001/user/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mealDesc, foodTags, symptomTags}),
+        });
       
         const data = await response.json();
       
         if (response.ok) {
           // 2. Save the token
-         // await saveToken(data.token);
-          navigation.navigate("Home")
+          console.log("yay")
       
          
         } else {
@@ -53,7 +57,7 @@ export default function LoginScreen() {
           secureTextEntry
           className="border p-2 mb-4"
         />
-        <Button title="Login" onPress={handleLogin} />
+        <Button title="Login" onPress={handleMeal} />
       </View>
     );
   }

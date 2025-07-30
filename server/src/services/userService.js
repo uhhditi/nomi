@@ -11,11 +11,12 @@ export const UserService = {
         return createdUser;
     },
     async loginUser(email, password){
-        const user = UserModel.findByEmail(email);
+        //return token 
+        const user = await UserModel.findByEmail(email);
         if(!user){
             return null;
         }
-        const validPassword = bcrypt.compare(password, user.hashedPassword);
+        const validPassword = await bcrypt.compare(password, user.hashedPassword);
         if(!validPassword){
             return null;
         }

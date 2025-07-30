@@ -14,6 +14,7 @@ export default function StartScreen() {
         Login: undefined;
         Signup: undefined;
         Start: undefined;
+        Meal: undefined;
       };
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Start'>>();
@@ -29,6 +30,9 @@ export default function StartScreen() {
             <Button title="login" onPress={() => navigation.navigate('Login')} />
             <Text>don't have an account yet?</Text>
             <Button title="signup" onPress={() => navigation.navigate('Signup')} />
+            <Text>log a meal - testing for now</Text>
+            <Button title="signup" onPress={() => navigation.navigate('Meal')} />
+              
         </View>
       );
   }
