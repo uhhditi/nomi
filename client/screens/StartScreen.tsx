@@ -5,6 +5,7 @@ import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-na
 import { IP_ADDRESS } from '@env'
 import LoginScreen from './LoginScreen';
 import SignupScreen from './SignupScreen';
+import React from 'react';
 
 
 export default function StartScreen() {
