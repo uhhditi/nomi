@@ -30,7 +30,7 @@ export async function getUser() {
 }
 
 export async function loginUser(email: string, password: string) {
-    const response = await fetch(`http://${IP_ADDRESS}:3001/user/`, {
+    const response = await fetch(`http://${IP_ADDRESS}:3001/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({email, password}),

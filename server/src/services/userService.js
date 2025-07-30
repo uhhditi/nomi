@@ -11,7 +11,7 @@ export const UserService = {
         return createdUser;
     },
     async loginUser(email, password){
-        //return token 
+        //return token !!!
         const user = await UserModel.findByEmail(email);
         if(!user){
             return null;
@@ -23,5 +23,7 @@ export const UserService = {
         else{
             console.log("password worked")
         }
+
+        return user;
     }
  }

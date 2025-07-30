@@ -1,7 +1,7 @@
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IP_ADDRESS } from '@env'
 import React from 'react';
 
@@ -46,14 +46,14 @@ export default function MealScreen() {
       <View className="flex-1 justify-center p-4">
         <TextInput
           placeholder="UserName"
-          value={email}
-          onChangeText={setEmail}
+         // value={email}
+         // onChangeText={setEmail}
           className="border p-2 mb-4"
         />
         <TextInput
           placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
+         // value={password}
+         // onChangeText={setPassword}
           secureTextEntry
           className="border p-2 mb-4"
         />
