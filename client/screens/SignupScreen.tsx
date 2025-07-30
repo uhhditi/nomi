@@ -47,13 +47,13 @@ export default function SignupScreen() {
           onChangeText={setEmail}
           className="border p-2 mb-4"
         />
-        {/* <TextInput
+        <TextInput
           placeholder="Password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
           className="border p-2 mb-4"
-        /> */}
+        />
         <Button title="sign up" onPress={handleSignup} />
       </View>
     );
