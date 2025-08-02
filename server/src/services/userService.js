@@ -24,7 +24,5 @@ export const UserService = {
             console.log("password worked")
             return user;
         }
-
-        return user;
     }
  }
