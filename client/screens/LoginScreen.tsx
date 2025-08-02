@@ -22,26 +22,20 @@ export default function LoginScreen() {
 
   
     async function handleLogin() {
-        // 1. Call backend API with user credentials
-        const response = await loginUser(email, password);
-      
-        const data = await response.json();
-      
-        if (response.ok) {
-          // 2. Save the token
-         // await saveToken(data.token);
-          navigation.navigate("Home")
-      
-         
-        } else {
-          alert('Login failed');
+      try {
+        const data = await loginUser(email, password);
+        if (data.success) {
+          navigation.navigate("Home");
         }
+      } catch (error) {
+        alert("wrong password or email");
+      }
       }
   
     return (
       <View className="flex-1 justify-center p-4">
         <TextInput
-          placeholder="UserName"
+          placeholder="email"
           value={email}
           onChangeText={setEmail}
           className="border p-2 mb-4"

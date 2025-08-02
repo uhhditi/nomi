@@ -17,8 +17,20 @@ export const UserController = {
     async loginUser(req, res){
         console.log("incoming user body:", req.body);
         try {
-            const newLogin = await UserService.loginUser(req.body);
-            res.status(200).json(newLogin);
+            const newLogin = await UserService.loginUser(req.body.email, req.body.password);
+            if (!newLogin) {
+                // Login failed (user not found or password invalid)
+                return res.status(401).json({ success: false, message: "Invalid credentials" });
+              }
+
+              const userData = {
+                name: newLogin.name,
+                email: newLogin.email,
+                // any other non-sensitive fields you want to include
+              };
+          
+              // Send success response
+              return res.status(200).json({ success: true, user: userData });
             
         } catch (error) {
             console.error("user login error:", error);

@@ -1,5 +1,5 @@
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IP_ADDRESS } from '@env'
@@ -23,6 +23,25 @@ export default function StartScreen() {
     async function checkLoginStatus() {
         //implement the check to see if user is already logged in and save their data w/ save token stuff 
       }
+
+      useEffect(() => {
+        console.log("Loaded IP_ADDRESS:", IP_ADDRESS);
+    
+        const url = `http://${IP_ADDRESS}:3001/user/`;
+        console.log("Testing URL:", url);
+    
+        fetch(url)
+          .then(res => {
+            console.log("HTTP Status:", res.status);
+            return res.text();
+          })
+          .then(body => {
+            console.log("Response body:", body);
+          })
+          .catch(err => {
+            console.error("Fetch error:", err.message);
+          });
+      }, []);
   
       return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

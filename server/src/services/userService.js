@@ -6,7 +6,7 @@ const saltRounds = 10;
 export const UserService = {
     async createUser(newUser) {
         const {name, email, password} = newUser;
-        const hashedPassword = bcrypt.hash(password, saltRounds);
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
         const createdUser = await UserModel.create({ name, email, password:hashedPassword });
         return createdUser;
     },
@@ -16,12 +16,13 @@ export const UserService = {
         if(!user){
             return null;
         }
-        const validPassword = await bcrypt.compare(password, user.hashedPassword);
+        const validPassword = await bcrypt.compare(password, user.hashed_password);
         if(!validPassword){
             return null;
         }
         else{
             console.log("password worked")
+            return user;
         }
 
         return user;

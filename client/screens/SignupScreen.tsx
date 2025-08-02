@@ -8,7 +8,7 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import React from 'react';
 
 export default function SignupScreen() {
-    const [username, setUsername] = useState('');
+   // const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');

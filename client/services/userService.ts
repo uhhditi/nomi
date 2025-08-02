@@ -17,17 +17,17 @@ export async function setUser(name: string, email: string, password: string) {
     return response.json();
 }
 
-export async function getUser() {
-    const response = await fetch(`http://${IP_ADDRESS}:3001/user/`);
-      if (response.ok) {
-        console.log("yay")
-      } else {
-        alert('user fetch failed');
-      }
+// export async function getUser() {
+//     const response = await fetch(`http://${IP_ADDRESS}:3001/user/`);
+//       if (response.ok) {
+//         console.log("yay")
+//       } else {
+//         alert('user fetch failed');
+//       }
 
-      const json = await response.json();
-      return json;
-}
+//       const json = await response.json();
+//       return json;
+// }
 
 export async function loginUser(email: string, password: string) {
     const response = await fetch(`http://${IP_ADDRESS}:3001/user/login`, {
