@@ -2,7 +2,7 @@ import { Button, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { IP_ADDRESS } from '@env'
+import { IP_ADDRESS, PORT } from '@env'
 import React from 'react';
 
 
@@ -25,7 +25,7 @@ export default function StartScreen() {
       useEffect(() => {
         console.log("Loaded IP_ADDRESS:", IP_ADDRESS);
     
-        const url = `http://${IP_ADDRESS}:3001/user/`;
+        const url = `http://${IP_ADDRESS}:${PORT}/user/`;
         console.log("Testing URL:", url);
     
         fetch(url)

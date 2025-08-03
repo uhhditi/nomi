@@ -8,7 +8,11 @@ export const UserService = {
         const {name, email, password} = newUser;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         const createdUser = await UserModel.create({ name, email, password:hashedPassword });
-        return createdUser;
+
+        const accessToken = jwt.sign({ userId: createdUser.id }, process.env.JWT_SECRET, { expiresIn: "15m" });
+        const refreshToken = jwt.sign({ userId: createdUser.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+
+        return { accessToken: accessToken, refreshToken: refreshToken, user: createdUser }; 
     },
     async loginUser(email, password){
         //return token !!!
@@ -21,8 +25,20 @@ export const UserService = {
             return null;
         }
         else{
+            const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "15m" });
+            const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
             console.log("password worked")
-            return user;
+            return { accessToken: accessToken, refreshToken: refreshToken, user: user };
         }
     }
- }
+}
+
+export const refreshToken = (refreshToken) => {
+    try {
+      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      const accessToken = jwt.sign({ userId: decoded.userId }, process.env.JWT_SECRET, { expiresIn: "15m" });
+      res.json({ accessToken });
+    } catch (error) {
+      res.status(401).json({ error: "Invalid refresh token" });
+    }
+  };

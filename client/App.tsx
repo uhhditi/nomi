@@ -9,6 +9,7 @@ import LoginScreen from './screens/LoginScreen';
 import StartScreen from './screens/StartScreen';
 import MealScreen from './screens/MealScreen';
 import SymptomScreen from './screens/SymptomScreen';
+import { AuthProvider } from './context/AuthContext';
 
 type RootStackParamList = {
   Home: undefined;
@@ -51,7 +52,8 @@ function HomeScreen() {
 
 export default function App() {
   return (
-    <NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Home" component={HomeScreen} 
         options={{ headerShown: false }}/>
@@ -63,5 +65,7 @@ export default function App() {
         options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
+    </AuthProvider>
+    
   );
 }

@@ -1,39 +1,87 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
-import { setUser, loginUser } from '../services/userService';
-import React from 'react';
+import React, { createContext, useState, useContext } from 'react';
+import { storeToken, storeRefreshToken, clearTokens, apiCall } from '../services/authService';
+import { IP_ADDRESS, PORT } from '@env';
 
 interface AuthProps {
-    authState?: {token: string | null; authenticated: boolean | null};
-    onRegister?: (name: string, email: string, password: string) => Promise<any>;
-    onLogin?: (email: string, password: string) => Promise<any>;
-    onLogout?: () => Promise<any>;
+  // authState?: {token: string | null; authenticated: boolean | null};
+  user?: {name: string, email: string, password: string | null} | null;
+  register: (name: string, email: string, password: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<any>;
+  logout: () => Promise<any>;
 }
 
-const TOKEN_KEY = 'my-jwt';
-export const API_URL = 'erm';
+export const AuthContext = createContext<AuthProps | undefined>(undefined);
 
-export const AuthContext = createContext<AuthProps>({});
+const API_URL = `http://${IP_ADDRESS}:${PORT}/user/login`;
 
-export const useAuth = () => {
-    return useContext(AuthContext);
-}
+export const AuthProvider = ({ children }: any) => {
+  const [user, setUser] = useState(null);
 
-export const AuthProvider = ({children}: any) => {
-    //auth state, initially set to null
-    const [AuthState, setAuthState] = useState<{
-        token: string | null;
-        authenticated: boolean | null;
-    }>({
-        token: null,
-        authenticated: null
-    })
+  const login = async (email: string, password: string) => {
+    try {
+        const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({email, password}),
+          });
     
-    const value = {
-        AuthState,
-        setAuthState,
-        onRegister: setUser
-    };
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
+          if (!response.ok) {
+            throw new Error("invalid login")
+          } 
+    
+        const data = await response.json();
+
+        setUser(data.user);
+        console.log("storing token");
+
+        await storeToken(data.accessToken);
+        await storeRefreshToken(data.refreshToken);
+        return data.email;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  const register = async (name: string, email: string, password: string) => {
+    try {
+        const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({name, email, password}),
+        });
+
+        console.log("Response status:", response.status);
+        const text = await response.text();
+        console.log("Response text:", text);
+
+          if (response.ok) {
+            console.log("yay")
+            const data = await response.json();
+            setUser(data.email);
+
+            await storeToken(data.accessToken);
+            await storeRefreshToken(data.refreshToken);
+            return data.user;
+          } else {
+            alert('signup failed');
+          }
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    setUser(null);
+    await clearTokens();
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

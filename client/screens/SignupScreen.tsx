@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { setUser } from '../services/userService';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import React from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 export default function SignupScreen() {
    // const [username, setUsername] = useState('');
@@ -22,11 +23,17 @@ export default function SignupScreen() {
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
 
-  
+      const auth = useContext(AuthContext);
+
+      if (!auth) {
+        throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
+      }
+
+      const { register } = auth;
       async function handleSignup() {
         try {
-          const data = await setUser(name, email, password); 
-          console.log(data); 
+          const data = await register(name, email, password); 
+          console.log("register data", data); 
         } catch (err) {
           console.error(err);
         }
