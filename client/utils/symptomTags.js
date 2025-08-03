@@ -1,9 +1,9 @@
 const symptomTags = [
     'Bloating',
 
-'Gas/flatulence',
+    'Gas/flatulence',
 
-'Stomach cramps',
+    'Stomach cramps',
 
-'Heartburn/acid reflux',
+    'Heartburn/acid reflux',
 ]

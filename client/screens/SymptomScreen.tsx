@@ -7,9 +7,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 
 
-export default function MealScreen() {
-    const [mealDesc, setMealDesc] = useState('');
-    const [mealNotes, setMealNotes] = useState('');
+export default function SymptomScreen() {
+    const [symptomList, setSymptomList] = useState('');
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     //const [show, setShow] = useState(true);
@@ -22,13 +21,14 @@ export default function MealScreen() {
         Signup: undefined;
         Meal: undefined;
         Start: undefined;
+        Symptom: undefined;
       };
       
-      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Meal'>>();
+      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Symptom'>>();
 
   
       //make function for adding the meal
-    async function handleMeal() {
+    async function handleSymptom() {
       navigation.navigate("Start"); 
       }
 
@@ -45,14 +45,8 @@ export default function MealScreen() {
   
     return (
       <View className="flex-1 justify-center p-4">
-        <Text>"Add Meal"</Text>
-        <Text>what did you eat?</Text>
-        <TextInput
-          placeholder="add details about your meal"
-          value={mealDesc}
-          onChangeText={setMealDesc}
-          className="border p-2 mb-4"
-        />
+        <Text>"Add Symptoms"</Text>
+        
         <DateTimePicker
             testID="dateTimePicker"
             value={date}
@@ -67,13 +61,7 @@ export default function MealScreen() {
             is24Hour={true}
             onChange={onChangeTime}
           />
-        <TextInput
-          placeholder="notes"
-          value={mealNotes}
-          onChangeText={setMealNotes}
-          className="border p-2 mb-4"
-        />
-        <Button title="add meal" onPress={handleMeal} />
+        <Button title="update symptoms" onPress={handleSymptom} />
       </View>
     );
   }

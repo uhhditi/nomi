@@ -1,7 +1,7 @@
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IP_ADDRESS } from '@env'
 import React from 'react';
 import { loginUser } from '../services/userService';

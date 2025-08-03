@@ -1,10 +1,8 @@
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IP_ADDRESS } from '@env'
-import LoginScreen from './LoginScreen';
-import SignupScreen from './SignupScreen';
 import React from 'react';
 
 
@@ -50,7 +48,7 @@ export default function StartScreen() {
             <Text>don't have an account yet?</Text>
             <Button title="signup" onPress={() => navigation.navigate('Signup')} />
             <Text>log a meal - testing for now</Text>
-            <Button title="signup" onPress={() => navigation.navigate('Meal')} />
+            <Button title="meal" onPress={() => navigation.navigate('Meal')} />
               
         </View>
       );
