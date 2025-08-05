@@ -52,20 +52,20 @@ export const AuthProvider = ({ children }: any) => {
         });
 
         console.log("Response status:", response.status);
-        const text = await response.text();
-        console.log("Response text:", text);
+        const data = await response.json();
+       // const text = await response.text();
+       // console.log("Response text:", text);
 
-          if (response.ok) {
-            console.log("yay")
-            const data = await response.json();
-            setUser(data.email);
-
-            await storeToken(data.accessToken);
-            await storeRefreshToken(data.refreshToken);
-            return data.user;
-          } else {
-            alert('signup failed');
+          if (!response.ok) {
+            console.error('Signup failed:', data);
+            throw new Error(data.message || 'Signup failed');
           }
+          console.log("yay")
+          setUser(data.user);
+          await storeToken(data.accessToken);
+          await storeRefreshToken(data.refreshToken);
+          return data.user;
+
     } catch (error) {
       console.error('Registration error:', error);
       throw error;

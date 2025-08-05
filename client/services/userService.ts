@@ -4,18 +4,21 @@ import { apiCall, storeRefreshToken, storeToken } from './authService';
 
 export async function setUser(name: string, email: string, password: string) {
   // const response = await apiCall(`user/`, 'POST');
-    const response = await fetch(`http://${IP_ADDRESS}:3001/user/`, {
+    const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({name, email, password}),
       });
-      if (response.ok) {
-        console.log("yay")
-      } else {
-        alert('signup failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert('Signup failed: ' + (errorData.message || 'Unknown error'));
+        return null;
       }
-
-    return response.json();
+      
+      const data = await response.json();
+      console.log("Signup success:", data);
+      return data;
+      
 }
 
 // export async function getUser() {

@@ -8,12 +8,12 @@ export const UserModel = {
       return result.rows[0];
     },
 
-  async create({ name, email, password }) {
+  async create({ name, email, hashed_password }) {
     const result = await db.query(`
       INSERT INTO users (name, email, hashed_password)
       VALUES ($1, $2, $3)
       RETURNING id, name, email, created_at
-    `, [name, email, password]);
+    `, [name, email, hashed_password]);
 
     return result.rows[0];
   }

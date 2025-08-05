@@ -30,7 +30,7 @@ export const UserController = {
               };
           
               // Send success response
-              return res.status(200).json({ success: true, user: userData });
+              return res.status(200).json({ success: true, user: userData, accessToken,refreshToken });
             
         } catch (error) {
             console.error("user login error:", error);
