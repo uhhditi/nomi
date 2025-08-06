@@ -18,19 +18,18 @@ export default function SignupScreen() {
         Home: undefined;
         Login: undefined;
         Signup: undefined;
-      };
+    };
       
-      
-      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
 
-      const auth = useContext(AuthContext);
+    const auth = useContext(AuthContext);
 
-      if (!auth) {
-        throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
-      }
+    if (!auth) {
+      throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
+    }
 
-      const { register } = auth;
-      async function handleSignup() {
+    const { register } = auth;
+    async function handleSignup() {
         try {
           const data = await register(name, email, password); 
           console.log("register data", data); 

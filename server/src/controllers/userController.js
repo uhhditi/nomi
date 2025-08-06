@@ -23,14 +23,14 @@ export const UserController = {
                 return res.status(401).json({ success: false, message: "Invalid credentials" });
               }
 
-              const userData = {
-                name: newLogin.name,
-                email: newLogin.email,
-                // any other non-sensitive fields you want to include
-              };
+            //   const userData = {
+            //     name: newLogin.name,
+            //     email: newLogin.email,
+            //     // any other non-sensitive fields you want to include
+            //   };
           
               // Send success response
-              return res.status(200).json({ success: true, user: userData, accessToken,refreshToken });
+              return res.status(200).json({ success: true, user: newLogin });
             
         } catch (error) {
             console.error("user login error:", error);

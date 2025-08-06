@@ -12,7 +12,9 @@ export const UserService = {
 
         const accessToken = jwt.sign({ userId: createdUser.id }, process.env.JWT_SECRET, { expiresIn: "15m" });
         const refreshToken = jwt.sign({ userId: createdUser.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
-
+        console.log(createdUser);
+        console.log("access token: " + accessToken);
+        console.log("refresh token: " + refreshToken);
         return { accessToken: accessToken, refreshToken: refreshToken, user: createdUser }; 
     },
     async loginUser(email, password){
@@ -28,7 +30,8 @@ export const UserService = {
         else{
             const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "15m" });
             const refreshToken = jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
-            console.log("password worked")
+            console.log("access token: " + accessToken);
+            console.log("refresh token: " + refreshToken);
             return { accessToken: accessToken, refreshToken: refreshToken, user: user };
         }
     }
