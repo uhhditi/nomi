@@ -25,18 +25,20 @@ export const AuthProvider = ({ children }: any) => {
             body: JSON.stringify({email, password}),
           });
     
-          if (!response.ok) {
-            throw new Error("invalid login")
-          } 
+        if (!response.ok) {
+          throw new Error("invalid login")
+        } 
     
         const data = await response.json();
 
         setUser(data.user);
         console.log("storing token");
 
-        await storeToken(data.accessToken);
-        await storeRefreshToken(data.refreshToken);
-        return data.email;
+        console.log("access token type: ", typeof (data.user.accessToken));
+        console.log("refresh token type: ", typeof (data.user.refreshToken));
+        await storeToken(data.user.accessToken);
+        await storeRefreshToken(data.user.refreshToken);
+        return data.user;
     } catch (error) {
       console.error('Login error:', error);
       throw error;

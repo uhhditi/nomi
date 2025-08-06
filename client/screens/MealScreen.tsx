@@ -13,9 +13,6 @@ export default function MealScreen() {
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     //const [show, setShow] = useState(true);
-    
-  
-
 
     type RootStackParamList = {
         Login: undefined;
@@ -26,20 +23,19 @@ export default function MealScreen() {
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Meal'>>();
 
-  
       //make function for adding the meal
     async function handleMeal() {
       navigation.navigate("Start"); 
-      }
+    }
 
-      const onChangeDate = (event: any, selectedDate: any) => {
-          const currentDate = selectedDate;
-          setDate(currentDate);
-      };
+    const onChangeDate = (event: any, selectedDate: any) => {
+        const currentDate = selectedDate;
+        setDate(currentDate);
+    };
 
-      const onChangeTime = (event: any, selectedTime: any) => {
-        const currentTime = selectedTime;
-        setTime(currentTime);
+    const onChangeTime = (event: any, selectedTime: any) => {
+      const currentTime = selectedTime;
+      setTime(currentTime);
     };
 
   
