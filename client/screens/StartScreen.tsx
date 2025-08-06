@@ -13,6 +13,7 @@ export default function StartScreen() {
         Signup: undefined;
         Start: undefined;
         Meal: undefined;
+        Symptom: undefined;
       };
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Start'>>();
@@ -49,6 +50,8 @@ export default function StartScreen() {
             <Button title="signup" onPress={() => navigation.navigate('Signup')} />
             <Text>log a meal - testing for now</Text>
             <Button title="meal" onPress={() => navigation.navigate('Meal')} />
+            <Text>log a symptom - testing </Text>
+            <Button title="symptom" onPress={() => navigation.navigate('Symptom')} />
               
         </View>
       );
