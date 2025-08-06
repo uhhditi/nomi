@@ -6,6 +6,7 @@ import { IP_ADDRESS, PORT } from '@env'
 import React from 'react';
 
 
+
 export default function StartScreen() {
 
     type RootStackParamList = {
@@ -44,7 +45,7 @@ export default function StartScreen() {
   
       return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>dygest</Text>
+            <Text style={{ color: '#7D60A3', fontSize: 40, fontWeight: '800' }}>dygest</Text>
             <Button title="login" onPress={() => navigation.navigate('Login')} />
             <Text>don't have an account yet?</Text>
             <Button title="signup" onPress={() => navigation.navigate('Signup')} />
