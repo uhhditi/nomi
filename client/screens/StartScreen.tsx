@@ -2,8 +2,9 @@ import { Button, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { IP_ADDRESS } from '@env'
+import { IP_ADDRESS, PORT } from '@env'
 import React from 'react';
+
 
 
 export default function StartScreen() {
@@ -13,6 +14,7 @@ export default function StartScreen() {
         Signup: undefined;
         Start: undefined;
         Meal: undefined;
+        Symptom: undefined;
       };
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Start'>>();
@@ -25,7 +27,7 @@ export default function StartScreen() {
       useEffect(() => {
         console.log("Loaded IP_ADDRESS:", IP_ADDRESS);
     
-        const url = `http://${IP_ADDRESS}:3001/user/`;
+        const url = `http://${IP_ADDRESS}:${PORT}/user/`;
         console.log("Testing URL:", url);
     
         fetch(url)
@@ -43,12 +45,14 @@ export default function StartScreen() {
   
       return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>dygest</Text>
+            <Text style={{ color: '#7D60A3', fontSize: 40, fontWeight: '800' }}>dygest</Text>
             <Button title="login" onPress={() => navigation.navigate('Login')} />
             <Text>don't have an account yet?</Text>
             <Button title="signup" onPress={() => navigation.navigate('Signup')} />
             <Text>log a meal - testing for now</Text>
             <Button title="meal" onPress={() => navigation.navigate('Meal')} />
+            <Text>log a symptom - testing </Text>
+            <Button title="symptom" onPress={() => navigation.navigate('Symptom')} />
               
         </View>
       );
