@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Button, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -40,32 +40,34 @@ export default function SignupScreen() {
       }
   
     return (
-      <View style={styles.container}>
-         <Text style={styles.signUpTitle}>Sign Up</Text>
-        <TextInput
-          placeholder="name"
-          value={name}
-          onChangeText={setName}
-          style={styles.signUpEntry}
-        />
-        <TextInput
-          placeholder="email"
-          value={email}
-          onChangeText={setEmail}
-          placeholderTextColor="#000000" 
-          style={styles.signUpEntry}
-        />
-        <TextInput
-          placeholder="password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.signUpEntry}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleSignup}>
-          <Text style={styles.button}>ready to dygest!</Text>
-        </TouchableOpacity> 
-      </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <Text style={styles.signUpTitle}>Sign Up</Text>
+          <TextInput
+            placeholder="name"
+            value={name}
+            onChangeText={setName}
+            style={styles.signUpEntry}
+          />
+          <TextInput
+            placeholder="email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.signUpEntry}
+          />
+          <TextInput
+            placeholder="password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.signUpEntry}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleSignup}>
+            <Text style={styles.button}>ready to dygest!</Text>
+          </TouchableOpacity> 
+        </View>
+      </TouchableWithoutFeedback>
+      
     );
   }
 

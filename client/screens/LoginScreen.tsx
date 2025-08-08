@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, TouchableOpacity, TextInput, View } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, TextInput, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -39,28 +39,31 @@ export default function LoginScreen() {
     }
   
     return (
-      <View style={styles.container}>
-        <Text style={styles.loginTitle}>Log Into Your Account</Text>
-        <TextInput
-          placeholder="email"
-          placeholderTextColor="#000000" 
-          value={email}
-          onChangeText={setEmail}
-          style={styles.logInEntry}
-        />
-        <TextInput
-          placeholder="password"
-           placeholderTextColor="#000000"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.logInEntry}
-        />
-     
-     <TouchableOpacity style={styles.button} onPress={handleLogin}>
-      <Text style={styles.button}>ready to login!</Text>
-    </TouchableOpacity> 
-      </View>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <Text style={styles.loginTitle}>Log Into Your Account</Text>
+          <TextInput
+            placeholder="email"
+            placeholderTextColor="#000000" 
+            value={email}
+            onChangeText={setEmail}
+            style={styles.logInEntry}
+          />
+          <TextInput
+            placeholder="password"
+            placeholderTextColor="#000000"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.logInEntry}
+          />
+      
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.button}>ready to login!</Text>
+          </TouchableOpacity> 
+        </View>
+      </TouchableWithoutFeedback>
+      
     );
   }
 
