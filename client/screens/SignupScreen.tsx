@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -40,27 +40,31 @@ export default function SignupScreen() {
       }
   
     return (
-      <View className="flex-1 justify-center p-4">
+      <View style={styles.container}>
+         <Text style={styles.signUpTitle}>Sign Up</Text>
         <TextInput
-          placeholder="Name"
+          placeholder="name"
           value={name}
           onChangeText={setName}
-          className="border p-2 mb-4"
+          style={styles.signUpEntry}
         />
         <TextInput
-          placeholder="Email"
+          placeholder="email"
           value={email}
           onChangeText={setEmail}
-          className="border p-2 mb-4"
+          placeholderTextColor="#000000" 
+          style={styles.signUpEntry}
         />
         <TextInput
-          placeholder="Password"
+          placeholder="password"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          className="border p-2 mb-4"
+          style={styles.signUpEntry}
         />
-        <Button title="sign up" onPress={handleSignup} />
+        <TouchableOpacity style={styles.button} onPress={handleSignup}>
+          <Text style={styles.button}>ready to dygest!</Text>
+        </TouchableOpacity> 
       </View>
     );
   }
@@ -68,3 +72,43 @@ export default function SignupScreen() {
 function saveToken(token: any) {
     throw new Error('Function not implemented.');
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF", // white
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 150,  // add some padding from the top of the screen
+  },
+  signUpTitle: {
+    fontFamily: "Inter",
+    fontSize: 25, 
+    fontWeight: "700", 
+    color: "#000000", 
+    textAlign: "center",
+    marginBottom: 20,
+    padding: 20
+  },
+  signUpEntry: {
+    backgroundColor: "#FFB563", // orange
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 10,
+    width: 320,
+    alignItems: "center",
+    fontFamily: "Inter",
+    textAlign: "center",
+    fontSize: 16, // loginSignup
+    marginBottom: 15,
+  },
+  button: {
+    marginTop: 10,
+    fontFamily: "Inter",
+    fontSize: 20,
+    fontWeight: "700",   // bold
+    color: "#7D60A3",    // whatever color you want
+    textAlign: "center",
+  },
+});

@@ -41,14 +41,14 @@ export default function MealScreen() {
 
   
     return (
-      <View className="flex-1 justify-center p-4">
+      <View >
         <Text>"Add Meal"</Text>
         <Text>what did you eat?</Text>
         <TextInput
           placeholder="add details about your meal"
           value={mealDesc}
           onChangeText={setMealDesc}
-          className="border p-2 mb-4"
+         
         />
         <DateTimePicker
             testID="dateTimePicker"
@@ -74,4 +74,4 @@ export default function MealScreen() {
       </View>
     );
   }
-
+  
