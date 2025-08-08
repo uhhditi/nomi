@@ -3,9 +3,11 @@ const { ZodError } = z;
 import jwt from 'jsonwebtoken';
 
 export function validateData(schema) {
+  console.log("in validation");
   return (req, res, next) => {
     try {
       req.body = schema.parse(req.body); //validate req with schema
+      console.log("in try of val")
       next();
     } catch (error) {
       if (error instanceof ZodError) { //if req body does not match schema

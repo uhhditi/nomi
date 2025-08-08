@@ -7,8 +7,8 @@ export const LogService = {
     },
 
     async createLog(newLog) {
-        const {meal, symptom, notes, userId} = newLog;
-        const createdLog = await LogModel.create({ meal, symptom, notes, userId });
+        const {description, notes, date, time, userId} = newLog;
+        const createdLog = await LogModel.create({ description, notes, date, time, userId });
         return createdLog;
     }
  }

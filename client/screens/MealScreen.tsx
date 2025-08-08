@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import { addLog } from '../services/logService';
 
 
 export default function MealScreen() {
@@ -25,7 +25,8 @@ export default function MealScreen() {
 
       //make function for adding the meal
     async function handleMeal() {
-      navigation.navigate("Start"); 
+      console.log("in handle meal");
+      addLog(mealDesc, mealNotes, date, time.toTimeString().split(' ')[0], 29);
     }
 
     const onChangeDate = (event: any, selectedDate: any) => {
