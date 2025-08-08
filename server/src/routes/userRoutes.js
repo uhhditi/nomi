@@ -1,4 +1,3 @@
-console.log("in user routes");
 import { Router } from "express";
 import { UserController } from "../controllers/userController.js";
 import { validateData } from "../middlewares/validationMiddleware.js";

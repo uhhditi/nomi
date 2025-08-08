@@ -10,12 +10,13 @@ export const LogModel = {
         return result.rows;
     },
 
-    async create({meal, symptom, notes, userId}) {
+    async create({description, notes, date, time, userId}) {
+        console.log("in validate data");
         const result = await db.query(`
-            INSERT INTO logs (meal, symptom, notes, user_id)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO logs (description, notes, user_id, date, time)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *`, 
-            [meal, symptom, notes, userId]
+            [description, notes, userId, date, time]
         );
         return result.rows[0];
     }

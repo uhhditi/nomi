@@ -8,7 +8,7 @@ export const LogsController = {
             console.log(logs);
             res.status(200).json(logs);
         } catch (error) {
-            res.status(500).send({message: "internal server error"});
+            res.status(500).send({message: error});
         }
         
     },

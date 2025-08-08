@@ -1,4 +1,3 @@
-console.log("✅ index.js is running");
 import express from 'express';
 import 'dotenv/config'
 import logsRoutes from './routes/logsRoutes.js'
