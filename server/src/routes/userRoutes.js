@@ -9,7 +9,4 @@ router.post('/', UserController.createUser);
 // router.post('/', validateData(createUserSchema), UserController.createUser);
 router.post('/login', UserController.loginUser);
 router.post('/refresh-token', UserController.refreshToken);
-router.get('/test', (req, res) => {
-    res.send('✅ User route is active');
-});
 export default router;

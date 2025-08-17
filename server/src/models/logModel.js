@@ -19,5 +19,17 @@ export const LogModel = {
             [description, notes, userId, date, time]
         );
         return result.rows[0];
+    },
+
+    async edit({description, notes, date, time, userId, id}) {
+        console.log("in validate data");
+        const result = await db.query(`
+            UPDATE logs
+            SET description = $1, notes = $2, user_id = $3, date = $4, time = $5
+            WHERE user_id = $3 AND id = $6
+            RETURNING *`, 
+            [description, notes, userId, date, time, id]
+        );
+        return result.rows[0];
     }
 }
