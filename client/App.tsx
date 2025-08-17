@@ -10,6 +10,7 @@ import StartScreen from './screens/StartScreen';
 import MealScreen from './screens/MealScreen';
 import SymptomScreen from './screens/SymptomScreen';
 import { AuthProvider } from './context/AuthContext';
+import DashboardScreen from './screens/DashboardScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -17,6 +18,7 @@ type RootStackParamList = {
   Start: undefined;
   Signup: undefined;
   Meal: undefined;
+  Dashboard: undefined;
   Symptom: undefined;
 };
 
@@ -59,6 +61,7 @@ export default function App() {
         options={{ headerShown: false }}/>
         <Stack.Screen name="Login" component={LoginScreen}/>
         <Stack.Screen name="Signup" component={SignupScreen}/>
+        <Stack.Screen name="Dashboard" component={DashboardScreen}/>
         <Stack.Screen name="Meal" component={MealScreen}/>
         <Stack.Screen name="Symptom" component={SymptomScreen}/>
         <Stack.Screen name="Start" component={StartScreen}

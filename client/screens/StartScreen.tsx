@@ -15,6 +15,7 @@ type RootStackParamList = {
   Start: undefined;
   Meal: undefined;
   Symptom: undefined;
+  Dashboard: undefined;
 };
 
 export default function StartScreen() {
@@ -75,6 +76,13 @@ export default function StartScreen() {
         onPress={() => navigation.navigate("Symptom")}
       >
         <Text style={styles.buttonText}>symptom</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("Dashboard")}
+      >
+        <Text style={styles.buttonText}>Dashboard</Text>
       </TouchableOpacity>
     </View>
   );
