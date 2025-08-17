@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useContext, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -57,6 +57,7 @@ export default function SymptomScreen() {
         Meal: undefined;
         Start: undefined;
         Symptom: undefined;
+        Dashboard: undefined;
       };
       
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Symptom'>>();
@@ -86,12 +87,11 @@ export default function SymptomScreen() {
 
   
     return (
-      <View style={styles.container}>
-        <Text>"Add Symptoms"</Text>
-        <Button
-          title="select symptoms"
-          onPress={() => refRBSheet.current?.open()}
-        />
+      <View style={styles.background}>
+        <Text style = {styles.title}>Add Symptoms</Text>
+        <TouchableOpacity style={styles.dropdownButton} onPress={() => refRBSheet.current?.open()}>
+              <Text style = {styles.buttonText}>select symptoms</Text>
+        </TouchableOpacity>
         <RBSheet
           ref={refRBSheet}
           useNativeDriver={true}
@@ -130,51 +130,44 @@ export default function SymptomScreen() {
               searchPlaceholder="Search..."
               value={symptomList}
               onChange={(items: string[]) => {
-                console.log("selected items", items)
                 setSymptomList(items as string[]);
               }}
               selectedStyle={styles.selectedStyle}
             />
             </View>
-            {/* <MultiSelect
-              hideTags
-              items={symptomTags}
-              uniqueKey="id"
-              ref={multiSelectRef}
-              onSelectedItemsChange={onSymptomListChange}
-              selectedItems={symptomList}
-              selectText="Pick Items"
-              searchInputPlaceholderText="Search Symptoms..."
-              onChangeInput={ (text)=> console.log(text)}
-              tagRemoveIconColor="#CCC"
-              tagBorderColor="#CCC"
-              tagTextColor="#CCC"
-              selectedItemTextColor="#CCC"
-              selectedItemIconColor="#CCC"
-              itemTextColor="#000"
-              displayKey="name"
-              searchInputStyle={{ color: '#CCC' }}
-              submitButtonColor="#CCC"
-              submitButtonText="Submit"
-            /> */}
-             <Button title="update symptoms" onPress={handleSymptom} />
         </RBSheet>
-
+        <View style={styles.tagsContainer}>
+          {symptomList.map((value) => {
+            const label = symptomTags.find(tag => tag.value === value)?.label;
+            return (
+              <View key={value} style={styles.tag}>
+                <Text style={styles.tagText}>{label}</Text>
+              </View>
+            );
+          })}
+        </View>
         
-        <DateTimePicker
-            testID="dateTimePicker"
+        <View style={styles.dateTimeRow}>
+          <DateTimePicker
             value={date}
-            mode={"date"}
+            mode="date"
             is24Hour={true}
             onChange={onChangeDate}
+            style={styles.dateTimePicker}
           />
           <DateTimePicker
-            testID="dateTimePicker"
             value={time}
-            mode={"time"}
+            mode="time"
             is24Hour={true}
             onChange={onChangeTime}
+            style={styles.dateTimePicker}
           />
+        </View>
+
+        <TouchableOpacity style={styles.button} onPress={handleSymptom}>
+              <Text style = {styles.buttonText}>add symptoms</Text>
+        </TouchableOpacity> 
+
       </View>
     );
   }
@@ -183,8 +176,8 @@ export default function SymptomScreen() {
     container: { padding: 16 },
     dropdown: {
       height: 50,
-      backgroundColor: 'transparent',
-      borderBottomColor: 'gray',
+      backgroundColor: '#ECFFC2',
+      borderBottomColor: '#ECFFC2',
       borderBottomWidth: 0.5,
     },
     placeholderStyle: {
@@ -207,5 +200,87 @@ export default function SymptomScreen() {
     selectedStyle: {
       borderRadius: 12,
     },
-  });
+    background: {
+      flex: 1,
+      backgroundColor: "#FFFFFF", // white
+      alignItems: "center",
+      justifyContent: "flex-start",
+      paddingTop: 60,  // add some padding from the top of the screen
+    },
+    subtitle: {
+      fontFamily: "Inter",
+      fontSize: 15, // smallText
+      fontWeight: "400", // normal
+      color: "#000000", // black
+      textAlign: "left",
+      marginTop: 15,
+      width: 320,        
+      paddingLeft: 4  
+    },
+    dateTimeRow: {
+      flexDirection: "row",
+      justifyContent: "center",   // center horizontally
+      alignItems: "center",
+      gap: 20,                 
+      marginBottom: 10,
+    },
+    dateTimePicker: {
+      width: 120,                
+    },
+    title: {
+      fontFamily: "Inter",
+      fontSize: 25, 
+      fontWeight: "700", 
+      color: "#000000", 
+      textAlign: "center",
+      marginBottom: 20,
+      padding: 20
+    },
+    button: {
+      backgroundColor: "#D8F793", // green
+      paddingVertical: 12,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+      marginTop: 30,
+      marginBottom: 20,
+      width: 240,
+      alignItems: "center",
+    },
+    dropdownButton: {
+      backgroundColor: "#ECFFC2", // light-green
+      paddingVertical: 32,
+      paddingHorizontal: 24,
+      borderRadius: 8,
+      marginTop: 30,
+      width: 300,
+      alignItems: "center",
+    },
+    buttonText: {
+      fontFamily: "Inter",
+      fontSize: 15, 
+      fontWeight: "500", 
+      color: "#000000", // black
+    },
 
+    tagsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      margin: 25,
+      justifyContent: "center",
+      gap: 4,
+ 
+    },
+    tag: {
+      backgroundColor: "#D8F793",
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 10,
+      margin: 3,
+    },
+    tagText: {
+      fontSize: 14,
+      color: "#000",
+      fontFamily: "Inter",
+    }
+    
+  });
