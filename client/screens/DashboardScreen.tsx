@@ -53,7 +53,7 @@ export default function DashboardScreen() {
                 </View>
                 <View>
                     <Image 
-                    source={require('/Users/aditia/Documents/GitHub/dygest-app/client/assets/pfp.png')}
+                    source={require('/Users/aditia/Desktop/dygest-app/client/assets/pfp.png')}
                     style={{ width: 102, height: 100 }}  
                     />
                 </View>
