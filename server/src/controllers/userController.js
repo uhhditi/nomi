@@ -10,7 +10,7 @@ export const UserController = {
             
         } catch (error) {
             console.error("user creation error:", error);
-            res.status(500).send({message: "internal server error"});
+            res.status(500).send({message: "internal server error", errorCode: error.code});
         }
     },
 

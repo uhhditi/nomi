@@ -59,6 +59,10 @@ export const AuthProvider = ({ children }: any) => {
        // console.log("Response text:", text);
 
           if (!response.ok) {
+            if (data.errorCode === "23505") {
+              alert("This email has an account associated with it. Please log in.");
+              return null;
+            }
             console.error('Signup failed:', data);
             throw new Error(data.message || 'Signup failed');
           }
