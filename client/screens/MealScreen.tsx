@@ -1,10 +1,11 @@
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addLog } from '../services/logService';
+import { AuthContext } from '../context/AuthContext';
 
 
 export default function MealScreen() {
@@ -13,6 +14,14 @@ export default function MealScreen() {
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     //const [show, setShow] = useState(true);
+
+    const auth = useContext(AuthContext);
+    
+    if (!auth) {
+      throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
+    }
+
+    const { user } = auth;
 
     type RootStackParamList = {
         Login: undefined;
@@ -23,10 +32,11 @@ export default function MealScreen() {
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Meal'>>();
 
+    
       //make function for adding the meal
     async function handleMeal() {
       console.log("in handle meal");
-      addLog(mealDesc, mealNotes, date, time.toTimeString().split(' ')[0], 29);
+      user && addLog(mealDesc, mealNotes, date, time.toTimeString().split(' ')[0], user.id);
     }
 
     const onChangeDate = (event: any, selectedDate: any) => {

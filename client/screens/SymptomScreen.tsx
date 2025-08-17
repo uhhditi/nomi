@@ -1,5 +1,5 @@
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
@@ -7,12 +7,21 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { MultiSelect } from 'react-native-element-dropdown';
 import { addSymptom } from '../services/symptomService';
+import { AuthContext } from '../context/AuthContext';
 
 export default function SymptomScreen() {
     const [symptomList, setSymptomList] = useState<string[]>([]);
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     const refRBSheet = useRef<any>(null);
+
+    const auth = useContext(AuthContext);
+    
+    if (!auth) {
+      throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
+    }
+
+    const { user } = auth;
 
     const symptomTags = [
       'Bloating',
@@ -52,15 +61,11 @@ export default function SymptomScreen() {
       
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Symptom'>>();
 
-    const hardCodedUserId = 29;
-
     async function handleSymptom() {
       refRBSheet.current?.close()
       console.log("symptom list", symptomList);
       for (let symptom of symptomList){
-        console.log("symptom", symptom);
-        console.log("symptom type", typeof symptom)
-        addSymptom(symptom, date, time.toTimeString().split(' ')[0], hardCodedUserId);
+        user && addSymptom(symptom, date, time.toTimeString().split(' ')[0], user.id);
       }
       navigation.navigate("Start"); 
       }

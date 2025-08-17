@@ -4,7 +4,7 @@ import { IP_ADDRESS, PORT } from '@env';
 
 interface AuthProps {
   // authState?: {token: string | null; authenticated: boolean | null};
-  user?: {name: string, email: string, password: string | null} | null;
+  user?: {name: string, email: string, password: string | null, id: number} | null;
   register: (name: string, email: string, password: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<any>;
@@ -30,8 +30,8 @@ export const AuthProvider = ({ children }: any) => {
         } 
     
         const data = await response.json();
-
-        setUser(data.user);
+        console.log("login user data", data.user);
+        setUser(data.user.user);
         console.log("storing token");
 
         console.log("access token type: ", typeof (data.user.accessToken));

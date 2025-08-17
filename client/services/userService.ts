@@ -12,10 +12,6 @@ export async function setUser(name: string, email: string, password: string) {
       if (!response.ok) {
         const errorData = await response.json();
         console.log("error code", errorData);
-        if (errorData.errorCode === "23505") {
-          alert("This email has an account associated with it. Please log in.");
-          return null;
-        }
         alert('Signup failed: ' + (errorData.message || 'Unknown error'));
         return null;
       }
