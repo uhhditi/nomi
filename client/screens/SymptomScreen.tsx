@@ -6,16 +6,13 @@ import React from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { MultiSelect } from 'react-native-element-dropdown';
-
-
-
+import { addSymptom } from '../services/symptomService';
 
 export default function SymptomScreen() {
     const [symptomList, setSymptomList] = useState<string[]>([]);
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     const refRBSheet = useRef<any>(null);
-
 
     const symptomTags = [
       'Bloating',
@@ -42,10 +39,9 @@ export default function SymptomScreen() {
       'Allergic reactions (rash, swelling)',
       'Difficulty swallowing',
       'Weight changes',
-    ].map((name, index) => ({ label: name, value: index.toString() }));
+    // ].map((name, index) => ({ label: name, value: index.toString() }));
+    ].map((name, index) => ({ label: name, value: name }));
     
-    
-  
     type RootStackParamList = {
         Login: undefined;
         Signup: undefined;
@@ -54,12 +50,18 @@ export default function SymptomScreen() {
         Symptom: undefined;
       };
       
-      const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Symptom'>>();
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Symptom'>>();
 
-  
-      //make function to send symptom tags to backend...
+    const hardCodedUserId = 29;
+
     async function handleSymptom() {
       refRBSheet.current?.close()
+      console.log("symptom list", symptomList);
+      for (let symptom of symptomList){
+        console.log("symptom", symptom);
+        console.log("symptom type", typeof symptom)
+        addSymptom(symptom, date, time.toTimeString().split(' ')[0], hardCodedUserId);
+      }
       navigation.navigate("Start"); 
       }
 
@@ -123,6 +125,7 @@ export default function SymptomScreen() {
               searchPlaceholder="Search..."
               value={symptomList}
               onChange={(items: string[]) => {
+                console.log("selected items", items)
                 setSymptomList(items as string[]);
               }}
               selectedStyle={styles.selectedStyle}
