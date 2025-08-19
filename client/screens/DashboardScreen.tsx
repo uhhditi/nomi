@@ -8,6 +8,7 @@ import { Image } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { BarChart} from "react-native-gifted-charts";
 import { Timestamp } from 'react-native-reanimated/lib/typescript/commonTypes';
+import { getSymptoms } from '../services/symptomService';
 
 
 
@@ -19,8 +20,14 @@ export default function DashboardScreen() {
         user_id: number;
         created_at: string;
       }
+
+      type Symptom = {
+        name: string;
+        user_id: number;
+      }
     
     const [recentLogs, setRecentLogs] = useState<String[]>(["", ""]);
+    const [symptomData, setSymptomData] = useState<{value: number; label: string}[]>([]);
 
 
 
@@ -43,7 +50,27 @@ export default function DashboardScreen() {
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Dashboard'>>();
 
-      //make method that displays two most recent meals 
+      //method that gets symptom data + maps to frequency 
+      async function fetchSymptoms(){
+        if (!user) return;
+        const symptoms: Symptom[] = await getSymptoms();
+        const userSymptoms = symptoms.filter(symptom => symptom.user_id === user.id);
+
+          // Count frequency of each symptom
+        const freqMap: Record<string, number> = {};
+        userSymptoms.forEach(s => {
+            freqMap[s.name] = (freqMap[s.name] || 0) + 1;
+        });
+        // Convert to chart format {value, label}
+        const formatted = Object.entries(freqMap).map(([name, count]) => ({
+            value: count,
+            label: name,
+        }));
+
+        setSymptomData(formatted);
+      }
+
+      //method that gets two most recent meals 
       async function logData(){
         if (!user) return;
         const logs: Log[] = await getLogs();
@@ -59,6 +86,7 @@ export default function DashboardScreen() {
 
       useEffect(() => {
         logData();
+        fetchSymptoms(); 
       }, []);
 
     return (
@@ -92,6 +120,21 @@ export default function DashboardScreen() {
                 <TouchableOpacity onPress={() => navigation.navigate("Symptom")}>
                     <Text style = {styles.subtitle}>+ new symptom</Text>
                 </TouchableOpacity> 
+            </View>
+            <View style={{ marginTop: 20, alignItems: "center" }}>
+            {symptomData.length > 0 ? (
+                <BarChart
+                data={symptomData}
+                barWidth={30}
+                spacing={20}
+                frontColor="#FFB563"
+                yAxisThickness={0}
+                xAxisThickness={0}
+                noOfSections={3}
+                />
+            ) : (
+                <Text style={{ fontFamily: "Inter", marginTop: 10 }}>add symptoms to see trends!</Text>
+            )}
             </View>
         </View>
     );
