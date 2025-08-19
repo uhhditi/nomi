@@ -1,14 +1,14 @@
 import { IP_ADDRESS, PORT } from '@env'
 import * as SecureStore from 'expo-secure-store';
 
-// export async function getLogs() {
-//     const response = await fetch(`http://${IP_ADDRESS}:3001/logs/`);
-//     if (!response.ok) {
-//         throw new Error("failed to fetch logs")
-//     }
+export async function getLogs() {
+    const response = await fetch(`http://${IP_ADDRESS}:${PORT}/symptom`);
+    if (!response.ok) {
+        throw new Error("failed to fetch symptoms")
+    }
 
-//     return response.json();
-// }
+    return response.json();
+}
 
 export async function addSymptom(name: string, date: Date, time: string, userId: number) {
   console.log("in add symptom");

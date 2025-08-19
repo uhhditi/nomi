@@ -2,6 +2,17 @@ import { SymptomService } from "../services/symptomService.js"
 
 //handles requests - calls services
 export const SymptomController = {
+    async getAllSymptoms(req, res) {
+        try {
+            const symptoms = await LogService.getAllSymptoms();
+            console.log(symptoms);
+            res.status(200).json(symptoms);
+        } catch (error) {
+            res.status(500).send({message: error});
+        }
+        
+    },
+
     async createSymptom(req, res){
         console.log("incoming symptom body:", req.body);
         try {

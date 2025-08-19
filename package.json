@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "@react-native-community/datetimepicker": "^8.4.3",
-    "expo": "^53.0.20"
+    "expo": "^53.0.20",
+    "expo-linear-gradient": "~14.1.5",
+    "react-native-gifted-charts": "^1.4.63",
+    "react-native-svg": "15.11.2"
   }
 }

@@ -18,6 +18,7 @@ export default function LoginScreen() {
         Meal: undefined;
         Login: undefined;
         Signup: undefined;
+        Dashboard: undefined;
       };
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
@@ -31,7 +32,7 @@ export default function LoginScreen() {
       try {
         const data = await login(email, password);
         if (data.accessToken || data.refreshToken) {
-          navigation.navigate("Meal");
+          navigation.navigate("Dashboard");
         }
       } catch (error) {
         alert("wrong password or email");

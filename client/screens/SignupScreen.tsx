@@ -1,10 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Button, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { setUser } from '../services/userService';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import React from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -40,6 +38,9 @@ export default function SignupScreen() {
       }
   
     return (
+      <KeyboardAvoidingView 
+      style={{ flex: 1 }} 
+      behavior={Platform.OS === "ios" ? "padding" : "height"} >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
           <Text style={styles.signUpTitle}>Sign Up</Text>
@@ -67,6 +68,7 @@ export default function SignupScreen() {
           </TouchableOpacity> 
         </View>
       </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
       
     );
   }

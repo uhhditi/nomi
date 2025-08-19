@@ -1,17 +1,23 @@
 import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {getLogs } from '../services/logService';
 import { Image } from 'react-native';
+import { AuthContext } from '../context/AuthContext';
+import { BarChart} from "react-native-gifted-charts";
+import { Timestamp } from 'react-native-reanimated/lib/typescript/commonTypes';
 
 
 
 export default function DashboardScreen() {
 
+
     type Log = {
         description: string;
+        user_id: number;
+        created_at: string;
       }
     
     const [recentLogs, setRecentLogs] = useState<String[]>(["", ""]);
@@ -27,15 +33,27 @@ export default function DashboardScreen() {
         Symptom: undefined;
       };
 
-     
+      const auth = useContext(AuthContext);
+    
+      if (!auth) {
+        throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
+      }
+  
+      const { user } = auth;
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Dashboard'>>();
 
       //make method that displays two most recent meals 
       async function logData(){
+        if (!user) return;
         const logs: Log[] = await getLogs();
-        const logDesc = logs.map(log => log.description);
-        const twoMostRecent = logDesc.slice(0,2);
+        const userLogs = logs.filter(log => log.user_id === user.id);
+        const sortedLogs = userLogs.sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        
+          // Take the two most recent descriptions
+        const twoMostRecent = sortedLogs.slice(0, 2).map(log => log.description);
         setRecentLogs(twoMostRecent); 
       }
 
@@ -47,7 +65,7 @@ export default function DashboardScreen() {
         <View style = {styles.container}>
             <View style = {styles.headerRow}>
                 <View style={{ alignItems: 'flex-start', marginBottom: 20, paddingHorizontal: 20 }}>
-                    <Text style={styles.title}>Aditi's</Text>
+                    <Text style={styles.title}>{user?.name ?? "Your"}</Text>
                     <Text style={styles.title}>Food</Text>
                     <Text style={styles.title}>Diary</Text>
                 </View>

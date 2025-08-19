@@ -22,12 +22,6 @@ export const UserController = {
                 // Login failed (user not found or password invalid)
                 return res.status(401).json({ success: false, message: "Invalid credentials" });
               }
-
-            //   const userData = {
-            //     name: newLogin.name,
-            //     email: newLogin.email,
-            //     // any other non-sensitive fields you want to include
-            //   };
           
               // Send success response
               return res.status(200).json({ success: true, user: newLogin });

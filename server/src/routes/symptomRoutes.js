@@ -6,5 +6,6 @@ import { createSymptomSchema } from "../schemas/symptomSchema.js";
 const router = Router();
 
 router.post('/add', validateData(createSymptomSchema), SymptomController.createSymptom)
+router.get('/', SymptomController.getAllSymptoms);
 
 export default router;

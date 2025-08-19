@@ -15,7 +15,7 @@ export async function addLog(description: string, notes: string, date: Date, tim
     // const response = await apiCall(`user/`, 'POST');
     try {
       let accessToken = await SecureStore.getItemAsync('accessToken');
-      const response = await fetch(`http://${IP_ADDRESS}:${PORT}/logs/`, {
+      const response = await fetch(`http://${IP_ADDRESS}:${PORT}/logs/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
         body: JSON.stringify({description, notes, date, time, userId}),

@@ -60,7 +60,7 @@ export default function StartScreen() {
         <Text style={styles.buttonText}>signup</Text>
       </TouchableOpacity>
 
-      <Text style={styles.subtitle}>log a meal - testing for now</Text>
+      {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>
 
       <TouchableOpacity
         style={styles.button}
@@ -83,7 +83,7 @@ export default function StartScreen() {
         onPress={() => navigation.navigate("Dashboard")}
       >
         <Text style={styles.buttonText}>Dashboard</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }
