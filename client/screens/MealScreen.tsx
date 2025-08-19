@@ -28,6 +28,7 @@ export default function MealScreen() {
         Signup: undefined;
         Meal: undefined;
         Start: undefined;
+        Dashboard: undefined;
       };
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Meal'>>();
@@ -37,6 +38,7 @@ export default function MealScreen() {
     async function handleMeal() {
       console.log("in handle meal");
       user && addLog(mealDesc, mealNotes, date, time.toTimeString().split(' ')[0], user.id);
+      navigation.navigate("Dashboard"); 
     }
 
     const onChangeDate = (event: any, selectedDate: any) => {
@@ -101,7 +103,7 @@ export default function MealScreen() {
       backgroundColor: "#FFFFFF", // white
       alignItems: "center",
       justifyContent: "flex-start",
-      paddingTop: 60,  // add some padding from the top of the screen
+      paddingTop: 90,  // add some padding from the top of the screen
     },
     subtitle: {
       fontFamily: "Inter",

@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF", // white
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 200,  // add some padding from the top of the screen
+    paddingTop: 150,  // add some padding from the top of the screen
   },
   loginTitle: {
     fontFamily: "Inter",

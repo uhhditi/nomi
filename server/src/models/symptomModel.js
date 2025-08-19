@@ -2,6 +2,13 @@ import db from '../config/db.js';
 
 //handles interactions with database
 export const SymptomModel = {
+    async getAll() {
+        const result = await db.query(`SELECT * 
+            FROM symptoms 
+            ORDER BY id DESC`
+        );
+        return result.rows;
+    },
     async create({name, date, time, userId}) {
         const result = await db.query(`
             INSERT INTO symptoms (name, date, time, user_id)

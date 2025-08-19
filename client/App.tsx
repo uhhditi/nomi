@@ -61,9 +61,12 @@ export default function App() {
         options={{ headerShown: false }}/>
         <Stack.Screen name="Login" component={LoginScreen}/>
         <Stack.Screen name="Signup" component={SignupScreen}/>
-        <Stack.Screen name="Dashboard" component={DashboardScreen}/>
-        <Stack.Screen name="Meal" component={MealScreen}/>
-        <Stack.Screen name="Symptom" component={SymptomScreen}/>
+        <Stack.Screen name="Dashboard" component={DashboardScreen}
+        options={{ headerShown: false }}/>
+        <Stack.Screen name="Meal" component={MealScreen}
+        options={{ headerShown: false }}/>
+        <Stack.Screen name="Symptom" component={SymptomScreen}
+        options={{ headerShown: false }}/>
         <Stack.Screen name="Start" component={StartScreen}
         options={{ headerShown: false }} />
       </Stack.Navigator>

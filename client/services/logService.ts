@@ -2,17 +2,37 @@ import { IP_ADDRESS, PORT } from '@env'
 import * as SecureStore from 'expo-secure-store';
 
 export async function getLogs() {
-    const response = await fetch(`http://${IP_ADDRESS}:${PORT}/logs/`);
-    if (!response.ok) {
-        throw new Error("failed to fetch logs")
-    }
+  try {
+      // Get the access token 
+      let accessToken = await SecureStore.getItemAsync('accessToken');
+      
+      const response = await fetch(`http://${IP_ADDRESS}:${PORT}/logs/`, {
+          method: 'GET',
+          headers: { 
+              'Content-Type': 'application/json', 
+              'Authorization': `Bearer ${accessToken}` // Add auth header
+          }
+      });
+    
+      if (!response.ok) {
+          // Get more detailed error info
+          const errorData = await response.text();
+          console.log("Error response:", errorData);
+          throw new Error(`HTTP ${response.status}: ${errorData}`);
+      }
 
-    return response.json();
+      const data = await response.json();
+      return data;
+      
+  } catch (error) {
+      console.error("getLogs error:", error);
+      throw error;
+  }
 }
 
 export async function addLog(description: string, notes: string, date: Date, time: string, userId: number) {
   console.log("in add log");
-    // const response = await apiCall(`user/`, 'POST');
+
     try {
       let accessToken = await SecureStore.getItemAsync('accessToken');
       const response = await fetch(`http://${IP_ADDRESS}:${PORT}/logs/create`, {

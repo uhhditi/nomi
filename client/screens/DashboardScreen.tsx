@@ -7,7 +7,6 @@ import {getLogs } from '../services/logService';
 import { Image } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { BarChart} from "react-native-gifted-charts";
-import { Timestamp } from 'react-native-reanimated/lib/typescript/commonTypes';
 import { getSymptoms } from '../services/symptomService';
 
 
@@ -26,7 +25,7 @@ export default function DashboardScreen() {
         user_id: number;
       }
     
-    const [recentLogs, setRecentLogs] = useState<String[]>(["", ""]);
+    const [recentLogs, setRecentLogs] = useState<String[]>([]);
     const [symptomData, setSymptomData] = useState<{value: number; label: string}[]>([]);
 
 
@@ -91,6 +90,9 @@ export default function DashboardScreen() {
 
     return (
         <View style = {styles.container}>
+            <TouchableOpacity style={styles.signOutButton}  onPress={() => navigation.navigate("Start")}>
+                    <Text style = {styles.subtitle}>sign out</Text>
+            </TouchableOpacity>
             <View style = {styles.headerRow}>
                 <View style={{ alignItems: 'flex-start', marginBottom: 20, paddingHorizontal: 20 }}>
                     <Text style={styles.title}>{user?.name ?? "Your"}</Text>
@@ -121,16 +123,23 @@ export default function DashboardScreen() {
                     <Text style = {styles.subtitle}>+ new symptom</Text>
                 </TouchableOpacity> 
             </View>
-            <View style={{ marginTop: 20, alignItems: "center" }}>
+            <View style={{ marginTop: 10, alignItems: "center" }}>
             {symptomData.length > 0 ? (
                 <BarChart
                 data={symptomData}
                 barWidth={30}
-                spacing={20}
-                frontColor="#FFB563"
+                spacing={11}
+                frontColor="#7D60A3"
                 yAxisThickness={0}
                 xAxisThickness={0}
                 noOfSections={3}
+                xAxisLabelTextStyle={{
+                    fontSize: 7,
+                    color: "#000",
+                    width: 40,         // give each label enough space
+                    textAlign: "center"
+                  }}
+                xAxisTextNumberOfLines={2} 
                 />
             ) : (
                 <Text style={{ fontFamily: "Inter", marginTop: 10 }}>add symptoms to see trends!</Text>
@@ -146,7 +155,7 @@ export default function DashboardScreen() {
       backgroundColor: "#FFFFFF", // white
       //alignItems: "center",
       justifyContent: "flex-start",
-      paddingTop: 20,  // add some padding from the top of the screen
+      paddingTop: 100,  // add some padding from the top of the screen
       paddingHorizontal: 20,
     },
     subtitle: {
@@ -169,7 +178,7 @@ export default function DashboardScreen() {
         flexDirection: "row",
         justifyContent: "space-between",   // center horizontally
         alignItems: "center",
-        width: 320,          
+        width: 340,          
         alignSelf: "center",
       },
     mealColumn: {
@@ -187,6 +196,12 @@ export default function DashboardScreen() {
         color: "#000000", 
         textAlign: "left", 
     },
+    signOutButton: {
+        position: 'absolute',
+        top: 40,      // adjust based on status bar / padding
+        right: 20,    // distance from the right edge
+        zIndex: 10,   // ensure it’s on top
+      },
     meals: {
       backgroundColor: "#EFE7F8", //purple 
       paddingVertical: 28,

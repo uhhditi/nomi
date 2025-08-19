@@ -4,11 +4,11 @@ import { SymptomService } from "../services/symptomService.js"
 export const SymptomController = {
     async getAllSymptoms(req, res) {
         try {
-            const symptoms = await LogService.getAllSymptoms();
+            const symptoms = await SymptomService.getAllSymptoms();
             console.log(symptoms);
             res.status(200).json(symptoms);
         } catch (error) {
-            res.status(500).send({message: error});
+            res.status(500).send({message: error.message});
         }
         
     },
