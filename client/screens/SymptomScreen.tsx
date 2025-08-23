@@ -68,7 +68,7 @@ export default function SymptomScreen() {
       for (let symptom of symptomList){
         user && addSymptom(symptom, date, time.toTimeString().split(' ')[0], user.id);
       }
-      navigation.navigate("Start"); 
+      navigation.navigate("Dashboard"); 
       }
 
       async function onSymptomListChange(newSelected: string[]) {
