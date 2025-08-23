@@ -4,9 +4,11 @@ import { SymptomService } from "../services/symptomService.js"
 export const SymptomController = {
     async getAllSymptoms(req, res) {
         try {
-            const symptoms = await LogService.getAllSymptoms();
-            console.log(symptoms);
-            res.status(200).json(symptoms);
+            console.log("in get all symptoms")
+            console.log(req.body.id);
+            const id = await SymptomService.getAllSymptoms(req.body.id);
+            console.log("id", id);
+            res.status(200).json(id);
         } catch (error) {
             res.status(500).send({message: error});
         }

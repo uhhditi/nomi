@@ -10,5 +10,15 @@ export const SymptomModel = {
             [name, date, time, userId]
         );
         return result.rows[0];
-    }
+    },
+
+    async getAll( userId ) {
+        const result = await db.query(`
+            SELECT * 
+            FROM symptoms 
+            WHERE user_id = $1`,
+            [userId]
+        );
+        return result.rows;
+    },
 }

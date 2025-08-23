@@ -2,8 +2,9 @@ import { SymptomModel } from '../models/symptomModel.js'
 
 //handles logic
 export const SymptomService = {
-    async getAllSymptoms() {
-        return SymptomModel.getAll();
+    async getAllSymptoms(userId) {
+        console.log("user id", userId)
+        return SymptomModel.getAll(userId);
     },
     
     async createSymptom(newSymptom) {
