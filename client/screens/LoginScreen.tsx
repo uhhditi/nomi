@@ -2,7 +2,6 @@ import { Button, StyleSheet, Text, TouchableOpacity, TextInput, View, Keyboard, 
 import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { IP_ADDRESS } from '@env'
 import React from 'react';
 import { loginUser } from '../services/userService';
 import { AuthContext } from '../context/AuthContext';
