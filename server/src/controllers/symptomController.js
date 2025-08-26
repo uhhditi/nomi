@@ -10,7 +10,7 @@ export const SymptomController = {
             console.log("id", id);
             res.status(200).json(id);
         } catch (error) {
-            res.status(500).send({message: error});
+            res.status(500).send({message: error.message});
         }
         
     },

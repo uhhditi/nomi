@@ -103,7 +103,7 @@ export default function MealScreen() {
       backgroundColor: "#FFFFFF", // white
       alignItems: "center",
       justifyContent: "flex-start",
-      paddingTop: 60,  // add some padding from the top of the screen
+      paddingTop: 90,  // add some padding from the top of the screen
     },
     subtitle: {
       fontFamily: "Inter",

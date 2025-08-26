@@ -1,8 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
-import { Button, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { useContext, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -38,20 +37,19 @@ export default function SignupScreen() {
       }
   
     return (
-      <KeyboardAvoidingView 
-      style={{ flex: 1 }} 
-      behavior={Platform.OS === "ios" ? "padding" : "height"} >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
           <Text style={styles.signUpTitle}>Sign Up</Text>
           <TextInput
             placeholder="name"
+            placeholderTextColor="#000000"
             value={name}
             onChangeText={setName}
             style={styles.signUpEntry}
           />
           <TextInput
             placeholder="email"
+            placeholderTextColor="#000000"
             value={email}
             onChangeText={setEmail}
             style={styles.signUpEntry}
@@ -59,6 +57,7 @@ export default function SignupScreen() {
           <TextInput
             placeholder="password"
             value={password}
+            placeholderTextColor="#000000"
             onChangeText={setPassword}
             secureTextEntry
             style={styles.signUpEntry}
@@ -68,7 +67,6 @@ export default function SignupScreen() {
           </TouchableOpacity> 
         </View>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
       
     );
   }
@@ -78,12 +76,13 @@ function saveToken(token: any) {
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF", // white
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingTop: 150,  // add some padding from the top of the screen
+    paddingTop: 90,  // add some padding from the top of the screen
   },
   signUpTitle: {
     fontFamily: "Inter",

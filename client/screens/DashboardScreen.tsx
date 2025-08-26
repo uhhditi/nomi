@@ -7,7 +7,7 @@ import {getLogs } from '../services/logService';
 import { Image } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { BarChart} from "react-native-gifted-charts";
-import { Timestamp } from 'react-native-reanimated/lib/typescript/commonTypes';
+import { getSymptoms } from '../services/symptomService';
 
 
 
@@ -19,8 +19,14 @@ export default function DashboardScreen() {
         user_id: number;
         created_at: string;
       }
+
+      type Symptom = {
+        name: string;
+        user_id: number;
+      }
     
-    const [recentLogs, setRecentLogs] = useState<String[]>(["", ""]);
+    const [recentLogs, setRecentLogs] = useState<String[]>([]);
+    const [symptomData, setSymptomData] = useState<{value: number; label: string}[]>([]);
 
 
 
@@ -43,7 +49,27 @@ export default function DashboardScreen() {
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Dashboard'>>();
 
-      //make method that displays two most recent meals 
+      //method that gets symptom data + maps to frequency 
+      async function fetchSymptoms(){
+        if (!user) return;
+        const symptoms: Symptom[] = await getSymptoms();
+        const userSymptoms = symptoms.filter(symptom => symptom.user_id === user.id);
+
+          // Count frequency of each symptom
+        const freqMap: Record<string, number> = {};
+        userSymptoms.forEach(s => {
+            freqMap[s.name] = (freqMap[s.name] || 0) + 1;
+        });
+        // Convert to chart format {value, label}
+        const formatted = Object.entries(freqMap).map(([name, count]) => ({
+            value: count,
+            label: name,
+        }));
+
+        setSymptomData(formatted);
+      }
+
+      //method that gets two most recent meals 
       async function logData(){
         if (!user) return;
         const logs: Log[] = await getLogs();
@@ -59,10 +85,14 @@ export default function DashboardScreen() {
 
       useEffect(() => {
         logData();
+        fetchSymptoms(); 
       }, []);
 
     return (
         <View style = {styles.container}>
+            <TouchableOpacity style={styles.signOutButton}  onPress={() => navigation.navigate("Start")}>
+                    <Text style = {styles.subtitle}>sign out</Text>
+            </TouchableOpacity>
             <View style = {styles.headerRow}>
                 <View style={{ alignItems: 'flex-start', marginBottom: 20, paddingHorizontal: 20 }}>
                     <Text style={styles.title}>{user?.name ?? "Your"}</Text>
@@ -93,6 +123,28 @@ export default function DashboardScreen() {
                     <Text style = {styles.subtitle}>+ new symptom</Text>
                 </TouchableOpacity> 
             </View>
+            <View style={{ marginTop: 10, alignItems: "center" }}>
+            {symptomData.length > 0 ? (
+                <BarChart
+                data={symptomData}
+                barWidth={30}
+                spacing={11}
+                frontColor="#7D60A3"
+                yAxisThickness={0}
+                xAxisThickness={0}
+                noOfSections={3}
+                xAxisLabelTextStyle={{
+                    fontSize: 7,
+                    color: "#000",
+                    width: 40,         // give each label enough space
+                    textAlign: "center"
+                  }}
+                xAxisTextNumberOfLines={2} 
+                />
+            ) : (
+                <Text style={{ fontFamily: "Inter", marginTop: 10 }}>add symptoms to see trends!</Text>
+            )}
+            </View>
         </View>
     );
   }
@@ -103,7 +155,7 @@ export default function DashboardScreen() {
       backgroundColor: "#FFFFFF", // white
       //alignItems: "center",
       justifyContent: "flex-start",
-      paddingTop: 20,  // add some padding from the top of the screen
+      paddingTop: 100,  // add some padding from the top of the screen
       paddingHorizontal: 20,
     },
     subtitle: {
@@ -126,7 +178,7 @@ export default function DashboardScreen() {
         flexDirection: "row",
         justifyContent: "space-between",   // center horizontally
         alignItems: "center",
-        width: 320,          
+        width: 340,          
         alignSelf: "center",
       },
     mealColumn: {
@@ -144,6 +196,12 @@ export default function DashboardScreen() {
         color: "#000000", 
         textAlign: "left", 
     },
+    signOutButton: {
+        position: 'absolute',
+        top: 40,      // adjust based on status bar / padding
+        right: 20,    // distance from the right edge
+        zIndex: 10,   // ensure it’s on top
+      },
     meals: {
       backgroundColor: "#EFE7F8", //purple 
       paddingVertical: 28,

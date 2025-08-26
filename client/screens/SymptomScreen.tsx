@@ -27,17 +27,17 @@ export default function SymptomScreen() {
       'Bloating',
       'Gas/flatulence',
       'Stomach cramps',
-      'Heartburn/acid reflux',
+      'Heartburn',
+      'Acid Reflux',
       'Nausea',
       'Diarrhea',
       'Constipation',
       'Vomiting',
-      'Loss of appetite',
+      'Appetite Loss',
       'Acidic taste',
       'Belching',
       'Indigestion',
       'Abdominal pain',
-      'Feeling full quickly',
       'Food cravings',
       'Changes in bowel habits',
       'Mouth ulcers',
@@ -45,10 +45,9 @@ export default function SymptomScreen() {
       'Dry mouth',
       'Fatigue after eating',
       'Headache after eating',
-      'Allergic reactions (rash, swelling)',
+      'Allergic reactions',
       'Difficulty swallowing',
       'Weight changes',
-    // ].map((name, index) => ({ label: name, value: index.toString() }));
     ].map((name, index) => ({ label: name, value: name }));
     
     type RootStackParamList = {
@@ -205,7 +204,7 @@ export default function SymptomScreen() {
       backgroundColor: "#FFFFFF", // white
       alignItems: "center",
       justifyContent: "flex-start",
-      paddingTop: 60,  // add some padding from the top of the screen
+      paddingTop: 90,  // add some padding from the top of the screen
     },
     subtitle: {
       fontFamily: "Inter",
