@@ -63,27 +63,6 @@ export default function StartScreen() {
         <Text style={styles.buttonText}>signup</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("CreateGroup")}
-      >
-        <Text style={styles.buttonText}>Create Group</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("ChoreTracker")}
-      >
-        <Text style={styles.buttonText}>Chore Tracker</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("Rules")}
-      >
-        <Text style={styles.buttonText}>Roommate Rules</Text>
-      </TouchableOpacity>
-
       {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>
 
       <TouchableOpacity
