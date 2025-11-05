@@ -11,6 +11,7 @@ import MealScreen from './screens/MealScreen';
 import SymptomScreen from './screens/SymptomScreen';
 import { AuthProvider } from './context/AuthContext';
 import DashboardScreen from './screens/DashboardScreen';
+import CreateGroupScreen from './screens/CreateGroupScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -20,6 +21,7 @@ type RootStackParamList = {
   Meal: undefined;
   Dashboard: undefined;
   Symptom: undefined;
+  CreateGroup: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -66,6 +68,8 @@ export default function App() {
         <Stack.Screen name="Meal" component={MealScreen}
         options={{ headerShown: false }}/>
         <Stack.Screen name="Symptom" component={SymptomScreen}
+        options={{ headerShown: false }}/>
+        <Stack.Screen name="CreateGroup" component={CreateGroupScreen}
         options={{ headerShown: false }}/>
         <Stack.Screen name="Start" component={StartScreen}
         options={{ headerShown: false }} />

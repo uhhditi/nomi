@@ -16,6 +16,7 @@ type RootStackParamList = {
   Meal: undefined;
   Symptom: undefined;
   Dashboard: undefined;
+  CreateGroup: undefined;
 };
 
 export default function StartScreen() {
@@ -58,6 +59,13 @@ export default function StartScreen() {
         onPress={() => navigation.navigate("Signup")}
       >
         <Text style={styles.buttonText}>signup</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("CreateGroup")}
+      >
+        <Text style={styles.buttonText}>Create Group</Text>
       </TouchableOpacity>
 
       {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>
