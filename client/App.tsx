@@ -13,6 +13,7 @@ import { AuthProvider } from './context/AuthContext';
 import DashboardScreen from './screens/DashboardScreen';
 import CreateGroupScreen from './screens/CreateGroupScreen';
 import ChoreTrackerScreen from './screens/ChoreTrackerScreen';
+import RulesScreen from './screens/RulesScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -24,6 +25,7 @@ type RootStackParamList = {
   Symptom: undefined;
   CreateGroup: undefined;
   ChoreTracker: undefined;
+  Rules: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -74,6 +76,8 @@ export default function App() {
         <Stack.Screen name="CreateGroup" component={CreateGroupScreen}
         options={{ headerShown: false }}/>
         <Stack.Screen name="ChoreTracker" component={ChoreTrackerScreen}
+        options={{ headerShown: false }}/>
+        <Stack.Screen name="Rules" component={RulesScreen}
         options={{ headerShown: false }}/>
         <Stack.Screen name="Start" component={StartScreen}
         options={{ headerShown: false }} />
