@@ -16,6 +16,9 @@ type RootStackParamList = {
   Meal: undefined;
   Symptom: undefined;
   Dashboard: undefined;
+  CreateGroup: undefined;
+  ChoreTracker: undefined;
+  Rules: undefined;
 };
 
 export default function StartScreen() {
