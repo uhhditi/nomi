@@ -17,6 +17,10 @@ type RootStackParamList = {
   Symptom: undefined;
   Dashboard: undefined;
   RoommateDashboard: undefined;
+  Fridge: undefined;
+  CreateGroup: undefined;
+  ChoreTracker: undefined;
+  Rules: undefined;
 };
 
 export default function StartScreen() {
