@@ -53,13 +53,13 @@ export default function RoommateDashboardScreen() {
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Fridge</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.quickCard} onPress={() => notImplemented('Chores')}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('ChoreTracker' as never)}>
           <View style={styles.quickIcon}>
             <MaterialCommunityIcons name="iron" size={20} color="#14141A" />
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Chores</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.quickCard} onPress={() => notImplemented('Rules')}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Rules' as never)}>
           <View style={styles.quickIcon}>
             <Feather name="list" size={20} color="#14141A" />
           </View>
