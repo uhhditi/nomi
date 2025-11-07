@@ -21,6 +21,7 @@ type RootStackParamList = {
   CreateGroup: undefined;
   ChoreTracker: undefined;
   Rules: undefined;
+  NomiStart: undefined;
 };
 
 export default function StartScreen() {
@@ -70,6 +71,20 @@ export default function StartScreen() {
         onPress={() => navigation.navigate("RoommateDashboard")}
       >
         <Text style={styles.buttonText}>open roommate dashboard</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("CreateGroup")}
+      >
+        <Text style={styles.buttonText}>create group</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("NomiStart")}
+      >
+        <Text style={styles.buttonText}>nomi start</Text>
       </TouchableOpacity>
 
       {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>

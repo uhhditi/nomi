@@ -16,6 +16,7 @@ import FridgeScreen from './screens/FridgeScreen';
 import CreateGroupScreen from './screens/CreateGroupScreen';
 import ChoreTrackerScreen from './screens/ChoreTrackerScreen';
 import RulesScreen from './screens/RulesScreen';
+import NomiStartScreen from './screens/NomiStartScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -30,6 +31,7 @@ type RootStackParamList = {
   CreateGroup: undefined;
   ChoreTracker: undefined;
   Rules: undefined;
+  NomiStart: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -88,6 +90,8 @@ export default function App() {
         <Stack.Screen name="RoommateDashboard" component={RoommateDashboardScreen}
         options={{ headerShown: false }} />
         <Stack.Screen name="Fridge" component={FridgeScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="NomiStart" component={NomiStartScreen}
         options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
