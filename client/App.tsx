@@ -11,6 +11,8 @@ import MealScreen from './screens/MealScreen';
 import SymptomScreen from './screens/SymptomScreen';
 import { AuthProvider } from './context/AuthContext';
 import DashboardScreen from './screens/DashboardScreen';
+import RoommateDashboardScreen from './screens/RoommateDashboardScreen';
+import FridgeScreen from './screens/FridgeScreen';
 import CreateGroupScreen from './screens/CreateGroupScreen';
 import ChoreTrackerScreen from './screens/ChoreTrackerScreen';
 import RulesScreen from './screens/RulesScreen';
@@ -23,6 +25,8 @@ type RootStackParamList = {
   Meal: undefined;
   Dashboard: undefined;
   Symptom: undefined;
+  RoommateDashboard: undefined;
+  Fridge: undefined;
   CreateGroup: undefined;
   ChoreTracker: undefined;
   Rules: undefined;
@@ -80,6 +84,10 @@ export default function App() {
         <Stack.Screen name="Rules" component={RulesScreen}
         options={{ headerShown: false }}/>
         <Stack.Screen name="Start" component={StartScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="RoommateDashboard" component={RoommateDashboardScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="Fridge" component={FridgeScreen}
         options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

@@ -16,6 +16,8 @@ type RootStackParamList = {
   Meal: undefined;
   Symptom: undefined;
   Dashboard: undefined;
+  RoommateDashboard: undefined;
+  Fridge: undefined;
   CreateGroup: undefined;
   ChoreTracker: undefined;
   Rules: undefined;
@@ -61,6 +63,13 @@ export default function StartScreen() {
         onPress={() => navigation.navigate("Signup")}
       >
         <Text style={styles.buttonText}>signup</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("RoommateDashboard")}
+      >
+        <Text style={styles.buttonText}>open roommate dashboard</Text>
       </TouchableOpacity>
 
       {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>
