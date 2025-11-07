@@ -1,15 +1,14 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Image } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Image, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { searchUsers, createGroup } from '../services/groupsService';
 import React from 'react';
 
 type Friend = {
-  id: string;
-  name: string;
+  id: number;
   username: string;
-  description?: string;
-  avatar?: any;
+  email: string;
 };
 
 type RootStackParamList = {
@@ -21,41 +20,62 @@ export default function CreateGroupScreen() {
   const [groupName, setGroupName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [addedMembers, setAddedMembers] = useState<Friend[]>([]);
+  const [searchResults, setSearchResults] = useState<Friend[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'CreateGroup'>>();
-
+    // Search users as they type
+  useEffect(() => {
+    const searchTimeout = setTimeout(async () => {
+      if (searchQuery.trim().length > 0) {
+        setIsSearching(true);
+        try {
+          const results = await searchUsers(searchQuery);
+          setSearchResults(results);
+        } catch (error) {
+          console.error('Search error:', error);
+          setSearchResults([]);
+        } finally {
+          setIsSearching(false);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    }, 500); // Debounce search by 500ms
+    return () => clearTimeout(searchTimeout);
+  }, [searchQuery]);
   // Mock suggested friends data
-  const suggestedFriends: Friend[] = [
-    {
-      id: '1',
-      name: 'Sarah Wilson',
-      username: '@sarah_wilson',
-      description: 'Mutual friend with Emma',
-      avatar: require('../assets/pfp.png'),
-    },
-    {
-      id: '2',
-      name: 'Mike Chen',
-      username: '@mike_chen',
-      description: 'Recently interacted',
-      avatar: require('../assets/pfp.png'),
-    },
-    {
-      id: '3',
-      name: 'Alex Rodriguez',
-      username: '@alex_rod',
-      avatar: require('../assets/pfp.png'),
-    },
-    {
-      id: '4',
-      name: 'Emma Davis',
-      username: '@emma_davis',
-      description: 'Mutual friend with Sarah',
-      avatar: require('../assets/pfp.png'),
-    },
-  ];
+  // const suggestedFriends: Friend[] = [
+  //   {
+  //     id: '1',
+  //     name: 'Sarah Wilson',
+  //     username: '@sarah_wilson',
+  //     description: 'Mutual friend with Emma',
+  //     avatar: require('../assets/pfp.png'),
+  //   },
+  //   {
+  //     id: '2',
+  //     name: 'Mike Chen',
+  //     username: '@mike_chen',
+  //     description: 'Recently interacted',
+  //     avatar: require('../assets/pfp.png'),
+  //   },
+  //   {
+  //     id: '3',
+  //     name: 'Alex Rodriguez',
+  //     username: '@alex_rod',
+  //     avatar: require('../assets/pfp.png'),
+  //   },
+  //   {
+  //     id: '4',
+  //     name: 'Emma Davis',
+  //     username: '@emma_davis',
+  //     description: 'Mutual friend with Sarah',
+  //     avatar: require('../assets/pfp.png'),
+  //   },
+  // ];
 
-  const isAdded = (friendId: string) => {
+  const isAdded = (friendId: number) => {
     return addedMembers.some(member => member.id === friendId);
   };
 
@@ -65,21 +85,39 @@ export default function CreateGroupScreen() {
     }
   };
 
-  const handleRemoveMember = (friendId: string) => {
+  const handleRemoveMember = (friendId: number) => {
     setAddedMembers(addedMembers.filter(member => member.id !== friendId));
   };
 
-  const filteredFriends = suggestedFriends.filter(friend =>
-    friend.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    friend.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // const filteredFriends = suggestedFriends.filter(friend =>
+  //   friend.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //   friend.username.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
-  const handleCreateGroup = () => {
-    // Frontend only - no backend implementation yet
-    console.log('Creating group:', { groupName, members: addedMembers });
-    // Could navigate back or show success message
-    navigation.goBack();
+  const handleCreateGroup = async () => {
+    if (!groupName.trim()) {
+      Alert.alert('Error', 'Please enter a group name');
+      return;
+    }
+
+    if (addedMembers.length === 0) {
+      Alert.alert('Error', 'Please add at least one member');
+      return;
+    }
+
+    try {
+  const memberUsernames = addedMembers.map(m => m.username);
+  const result = await createGroup(groupName, memberUsernames);
+  Alert.alert('Success', `Group "${result.name}" created!`, [
+    { text: 'OK', onPress: () => navigation.goBack() }
+  ]);
+} catch (e: any) {
+  console.error('Create group error:', e);
+  Alert.alert('Error', e.message ?? 'Failed to create group.');
+}
+
   };
+
 
   return (
     <View style={styles.container}>
@@ -89,9 +127,7 @@ export default function CreateGroupScreen() {
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Group</Text>
-        <TouchableOpacity>
-          <Text style={styles.nextButton}>Next</Text>
-        </TouchableOpacity>
+        <View style={{width: 50}} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -106,17 +142,26 @@ export default function CreateGroupScreen() {
 
         {/* Added Members Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionText}>Add members to get started.</Text>
+          <Text style={styles.sectionText}>
+            {addedMembers.length === 0 
+              ? 'Add members to get started.' 
+              : `${addedMembers.length} member(s) added`}
+          </Text>
           <View style={styles.addedMembersContainer}>
             {addedMembers.map((member) => (
               <View key={member.id} style={styles.memberAvatarContainer}>
-                <Image source={member.avatar || require('../assets/pfp.png')} style={styles.memberAvatar} />
+                <View style={styles.memberAvatar}>
+                  <Text style={styles.memberInitial}>
+                    {member.username[0].toUpperCase()}
+                  </Text>
+                </View>
                 <TouchableOpacity
                   style={styles.removeButton}
                   onPress={() => handleRemoveMember(member.id)}
                 >
                   <Text style={styles.removeButtonText}>×</Text>
                 </TouchableOpacity>
+                <Text style={styles.memberUsername}>{member.username}</Text>
               </View>
             ))}
           </View>
@@ -134,41 +179,49 @@ export default function CreateGroupScreen() {
           />
         </View>
 
-        {/* Suggested Friends Section */}
-        <Text style={styles.suggestedTitle}>Suggested Friends</Text>
-        <View style={styles.friendsList}>
-          {filteredFriends.map((friend) => {
-            const added = isAdded(friend.id);
-            return (
-              <View key={friend.id} style={styles.friendItem}>
-                <Image
-                  source={friend.avatar || require('../assets/pfp.png')}
-                  style={styles.friendAvatar}
-                />
-                <View style={styles.friendInfo}>
-                  <Text style={styles.friendName}>{friend.name}</Text>
-                  <Text style={styles.friendUsername}>{friend.username}</Text>
-                  {friend.description && (
-                    <Text style={styles.friendDescription}>{friend.description}</Text>
-                  )}
+        {/* Search Results */}
+        {isSearching && <Text style={styles.loadingText}>Searching...</Text>}
+        
+        {searchQuery.trim().length > 0 && !isSearching && (
+          <View style={styles.friendsList}>
+            <Text style={styles.suggestedTitle}>
+              {searchResults.length > 0 ? 'Search Results' : 'No users found'}
+            </Text>
+            {searchResults.map((friend) => {
+              const added = isAdded(friend.id);
+              return (
+                <View key={friend.id} style={styles.friendItem}>
+                  <View style={styles.friendAvatar}>
+                    <Text style={styles.avatarInitial}>
+                      {friend.username[0].toUpperCase()}
+                    </Text>
+                  </View>
+                  <View style={styles.friendInfo}>
+                    <Text style={styles.friendName}>{friend.username}</Text>
+                    <Text style={styles.friendUsername}>{friend.email}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.addButton, added && styles.addedButton]}
+                    onPress={() => handleAddMember(friend)}
+                    disabled={added}
+                  >
+                    <Text style={[styles.addButtonText, added && styles.addedButtonText]}>
+                      {added ? 'Added' : 'Add'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  style={[styles.addButton, added && styles.addedButton]}
-                  onPress={() => handleAddMember(friend)}
-                  disabled={added}
-                >
-                  <Text style={[styles.addButtonText, added && styles.addedButtonText]}>
-                    {added ? 'Added' : 'Add'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </View>
+              );
+            })}
+          </View>
+        )}
       </ScrollView>
 
       {/* Create Group Button */}
-      <TouchableOpacity style={styles.createButton} onPress={handleCreateGroup}>
+      <TouchableOpacity 
+        style={[styles.createButton, (!groupName.trim() || addedMembers.length === 0) && styles.createButtonDisabled]} 
+        onPress={handleCreateGroup}
+        disabled={!groupName.trim() || addedMembers.length === 0}
+      >
         <Text style={styles.createButtonText}>Create Group</Text>
       </TouchableOpacity>
     </View>
@@ -351,6 +404,33 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
     fontFamily: 'Inter',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#666666',
+    fontFamily: 'Inter',
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  memberInitial: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  memberUsername: {
+    fontSize: 10,
+    color: '#666666',
+    fontFamily: 'Inter',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  avatarInitial: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  createButtonDisabled: {
+    backgroundColor: '#E0E0E0',
   },
 });
 

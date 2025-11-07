@@ -62,7 +62,17 @@ export default function StartScreen() {
       >
         <Text style={styles.buttonText}>signup</Text>
       </TouchableOpacity>
-
+       {/* Test Button Section */}
+      <View style={styles.testSection}>
+        <Text style={styles.testLabel}>🧪 Testing Mode</Text>
+        
+        <TouchableOpacity
+          style={styles.testButton}
+          onPress={() => navigation.navigate("CreateGroup")}
+        >
+          <Text style={styles.testButtonText}>Test Create Group</Text>
+        </TouchableOpacity>
+      </View>
       {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>
 
       <TouchableOpacity
@@ -148,5 +158,36 @@ const styles = StyleSheet.create({
     fontSize: 20, // loginSignup
     fontWeight: "400", // extrabold
     color: "#00000", // white
+  },
+  testSection: {
+    marginTop: 50,
+    paddingTop: 30,
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+    width: "100%",
+    alignItems: "center",
+  },
+  testLabel: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666666",
+    marginBottom: 12,
+  },
+  testButton: {
+    backgroundColor: "#7D60A3", // dygestPurple
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#DAC4F7",
+    width: 240,
+    alignItems: "center",
+  },
+  testButtonText: {
+    fontFamily: "Inter",
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
 });
