@@ -6,6 +6,7 @@ import React from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { useRef } from 'react';
+import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 type Chore = {
   id: string;
@@ -20,6 +21,7 @@ type Chore = {
 type RootStackParamList = {
   ChoreTracker: undefined;
   Dashboard: undefined;
+  RoommateDashboard: undefined;
 };
 
 const MOCK_ROOMMATES = ['roommate 1', 'roommate 2', 'roommate 3', 'roommate 4'];
@@ -243,11 +245,9 @@ export default function ChoreTrackerScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
+        <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('RoommateDashboard' as never)}>
+          <Ionicons name="arrow-back" size={20} color="#14141A" />
           <Text style={styles.headerTitle}>Chore Tracker</Text>
-        </View>
-        <TouchableOpacity>
-          <Text style={styles.menuIcon}>☰</Text>
         </TouchableOpacity>
       </View>
 
@@ -465,36 +465,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+    paddingTop: 72,
+    paddingHorizontal: 16,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  headerIcon: {
-    fontSize: 24,
-    marginRight: 8,
+    gap: 8,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#C9C9EE',
     fontFamily: 'Inter',
-  },
-  menuIcon: {
-    fontSize: 24,
-    color: '#000000',
+    fontWeight: '600',
+    color: '#14141A',
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   weekNavigation: {
     flexDirection: 'row',

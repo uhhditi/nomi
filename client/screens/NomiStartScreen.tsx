@@ -1,9 +1,42 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthContext } from '../context/AuthContext';
+
+type RootStackParamList = {
+  RoommateDashboard: undefined;
+  Start: undefined;
+  NomiStart: undefined;
+  GroupWorkflow: undefined;
+};
 
 export default function NomiStartScreen() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'NomiStart'>>();
+  const auth = useContext(AuthContext);
+
+  if (!auth) {
+    throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
+  }
+
+  const { login, register } = auth;
+
+  const handleSignIn = async () => {
+    // For now, just navigate to dashboard without authentication check
+    navigation.navigate('RoommateDashboard');
+  };
+
+  const handleSignUp = async () => {
+    // For now, just navigate to group workflow without authentication check
+    navigation.navigate('GroupWorkflow');
+  };
 
   return (
     <View style={styles.container}>
@@ -37,14 +70,28 @@ export default function NomiStartScreen() {
             {/* Username/email */}
             <Text style={styles.label}>Username or Email</Text>
             <View style={styles.inputRow}>
-              <TextInput placeholder="Enter your username or email" placeholderTextColor="#9AA0A6" style={styles.input} />
+              <TextInput 
+                placeholder="Enter your username or email" 
+                placeholderTextColor="#9AA0A6" 
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+              />
               <MaterialCommunityIcons name="email-outline" size={18} color="#14141A" />
             </View>
 
             {/* Password */}
             <Text style={styles.label}>Password</Text>
             <View style={styles.inputRow}>
-              <TextInput placeholder="Enter your password" placeholderTextColor="#9AA0A6" style={styles.input} secureTextEntry />
+              <TextInput 
+                placeholder="Enter your password" 
+                placeholderTextColor="#9AA0A6" 
+                style={styles.input} 
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
               <Ionicons name="eye-off-outline" size={18} color="#14141A" />
             </View>
 
@@ -59,7 +106,7 @@ export default function NomiStartScreen() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.primaryBtn}>
+            <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn}>
               <Text style={styles.primaryBtnText}>Sign In</Text>
             </TouchableOpacity>
 
@@ -83,19 +130,41 @@ export default function NomiStartScreen() {
             {/* Username */}
             <Text style={styles.label}>Username</Text>
             <View style={styles.inputRow}>
-              <TextInput placeholder="Enter username" placeholderTextColor="#9AA0A6" style={styles.input} />
+              <TextInput 
+                placeholder="Enter username" 
+                placeholderTextColor="#9AA0A6" 
+                style={styles.input}
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+              />
               <Ionicons name="person-outline" size={18} color="#14141A" />
             </View>
             {/* Email */}
             <Text style={styles.label}>Email Address</Text>
             <View style={styles.inputRow}>
-              <TextInput placeholder="Enter email address" placeholderTextColor="#9AA0A6" style={styles.input} />
+              <TextInput 
+                placeholder="Enter email address" 
+                placeholderTextColor="#9AA0A6" 
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
               <MaterialCommunityIcons name="email-outline" size={18} color="#14141A" />
             </View>
             {/* Password */}
             <Text style={styles.label}>Password</Text>
             <View style={styles.inputRow}>
-              <TextInput placeholder="Create password" placeholderTextColor="#9AA0A6" style={styles.input} secureTextEntry />
+              <TextInput 
+                placeholder="Create password" 
+                placeholderTextColor="#9AA0A6" 
+                style={styles.input} 
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
               <Ionicons name="lock-closed-outline" size={18} color="#14141A" />
             </View>
 
@@ -116,13 +185,20 @@ export default function NomiStartScreen() {
             </View>
 
             {/* Confirm */}
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>Confirm Password</Text>
             <View style={styles.inputRow}>
-              <TextInput placeholder="Confirm password" placeholderTextColor="#9AA0A6" style={styles.input} secureTextEntry />
+              <TextInput 
+                placeholder="Confirm password" 
+                placeholderTextColor="#9AA0A6" 
+                style={styles.input} 
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
               <Ionicons name="lock-closed-outline" size={18} color="#14141A" />
             </View>
 
-            <TouchableOpacity style={styles.primaryBtn}>
+            <TouchableOpacity style={styles.primaryBtn} onPress={handleSignUp}>
               <Text style={styles.primaryBtnText}>Sign Up</Text>
             </TouchableOpacity>
 

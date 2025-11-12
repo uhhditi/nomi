@@ -11,11 +11,10 @@ export default function FridgeScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.goBack()}>
-          <MaterialCommunityIcons name="snowflake" size={18} color="#14141A" />
+        <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('RoommateDashboard' as never)}>
+          <Ionicons name="arrow-back" size={20} color="#14141A" />
           <Text style={styles.headerTitle}>Smart Fridge</Text>
         </TouchableOpacity>
-        <Feather name="menu" size={18} color="#14141A" />
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
@@ -111,7 +110,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    paddingTop: 56,
+    paddingTop: 72,
     paddingHorizontal: 16,
   },
   header: {
