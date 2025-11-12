@@ -17,6 +17,8 @@ import CreateGroupScreen from './screens/CreateGroupScreen';
 import ChoreTrackerScreen from './screens/ChoreTrackerScreen';
 import RulesScreen from './screens/RulesScreen';
 import NomiStartScreen from './screens/NomiStartScreen';
+import SettingsScreen from './screens/SettingsScreen';
+import GroupWorkflowScreen from './screens/GroupWorkflowScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -32,6 +34,8 @@ type RootStackParamList = {
   ChoreTracker: undefined;
   Rules: undefined;
   NomiStart: undefined;
+  Settings: undefined;
+  GroupWorkflow: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -68,7 +72,7 @@ export default function App() {
   return (
     <AuthProvider>
       <NavigationContainer>
-      <Stack.Navigator initialRouteName="Start">
+      <Stack.Navigator initialRouteName="NomiStart">
         <Stack.Screen name="Home" component={HomeScreen} 
         options={{ headerShown: false }}/>
         <Stack.Screen name="Login" component={LoginScreen}/>
@@ -92,6 +96,10 @@ export default function App() {
         <Stack.Screen name="Fridge" component={FridgeScreen}
         options={{ headerShown: false }} />
         <Stack.Screen name="NomiStart" component={NomiStartScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="Settings" component={SettingsScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="GroupWorkflow" component={GroupWorkflowScreen}
         options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

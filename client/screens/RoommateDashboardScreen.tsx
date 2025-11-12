@@ -20,9 +20,9 @@ export default function RoommateDashboardScreen() {
           <Text style={styles.userName}>nomi user</Text>
           <Text style={styles.userSub}>Apartment 2106</Text>
         </View>
-        <View style={styles.gearBtn}>
+        <TouchableOpacity style={styles.gearBtn} onPress={() => navigation.navigate('Settings' as never)}>
           <Ionicons name="settings-sharp" size={18} color="#14141A" />
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* Top stats */}
@@ -79,33 +79,6 @@ export default function RoommateDashboardScreen() {
         <TouchableOpacity style={styles.aiButton} onPress={() => notImplemented('View recipe')}>
           <Text style={styles.aiButtonText}>view recipe</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Roommate Status */}
-      <Text style={styles.sectionTitle}>Roommate Status</Text>
-      <View style={styles.roommateCard}>
-        <View style={styles.roommateRow}>
-          <View style={styles.roommateAvatar}>
-            <Ionicons name="person" size={18} color="#14141A" />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.roommateName}>roommate 1</Text>
-            <Text style={styles.roommateSub}>Available Now</Text>
-          </View>
-          <View style={[styles.statusDot, { backgroundColor: '#33A852' }]} />
-        </View>
-      </View>
-      <View style={styles.roommateCard}>
-        <View style={styles.roommateRow}>
-          <View style={styles.roommateAvatar}>
-            <Ionicons name="person" size={18} color="#14141A" />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.roommateName}>roommate 2</Text>
-            <Text style={styles.roommateSub}>Busy</Text>
-          </View>
-          <View style={[styles.statusDot, { backgroundColor: '#C9C9CF' }]} />
-        </View>
       </View>
 
       {/* Recent Activity */}
@@ -349,44 +322,6 @@ const styles = StyleSheet.create({
     color: '#14141A',
     marginTop: 16,
     marginBottom: 8,
-  },
-  roommateCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: BORDER,
-    marginBottom: 10,
-  },
-  roommateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  roommateAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#E7E6F5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  roommateName: {
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'Inter',
-    color: '#14141A',
-  },
-  roommateSub: {
-    fontSize: 13,
-    fontFamily: 'Inter',
-    fontWeight: '500',
-    color: '#4A4A55',
-    marginTop: 2,
-  },
-  statusDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
   },
   activityCard: {
     backgroundColor: '#FFFFFF',
