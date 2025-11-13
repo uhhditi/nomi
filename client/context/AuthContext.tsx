@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }: any) => {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log("body: ", JSON.stringify({email, password}))
         const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

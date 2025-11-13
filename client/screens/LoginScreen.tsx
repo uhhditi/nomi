@@ -29,6 +29,7 @@ export default function LoginScreen() {
     const { login } = auth;
     async function handleLogin() {
       try {
+        console.log(email, password);
         const data = await login(email, password);
         if (data.accessToken || data.refreshToken) {
           navigation.navigate("Dashboard");
