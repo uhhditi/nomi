@@ -16,9 +16,12 @@ type RootStackParamList = {
   Meal: undefined;
   Symptom: undefined;
   Dashboard: undefined;
+  RoommateDashboard: undefined;
+  Fridge: undefined;
   CreateGroup: undefined;
   ChoreTracker: undefined;
   Rules: undefined;
+  NomiStart: undefined;
 };
 
 export default function StartScreen() {
@@ -62,17 +65,28 @@ export default function StartScreen() {
       >
         <Text style={styles.buttonText}>signup</Text>
       </TouchableOpacity>
-       {/* Test Button Section */}
-      <View style={styles.testSection}>
-        <Text style={styles.testLabel}>🧪 Testing Mode</Text>
-        
-        <TouchableOpacity
-          style={styles.testButton}
-          onPress={() => navigation.navigate("CreateGroup")}
-        >
-          <Text style={styles.testButtonText}>Test Create Group</Text>
-        </TouchableOpacity>
-      </View>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("RoommateDashboard")}
+      >
+        <Text style={styles.buttonText}>open roommate dashboard</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("CreateGroup")}
+      >
+        <Text style={styles.buttonText}>create group</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("NomiStart")}
+      >
+        <Text style={styles.buttonText}>nomi start</Text>
+      </TouchableOpacity>
+
       {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>
 
       <TouchableOpacity
