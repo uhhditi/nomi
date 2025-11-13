@@ -15,7 +15,7 @@ app.use(express.json());
 app.use('/logs', verifyToken, logsRoutes);
 app.use('/user', userRoutes);
 app.use('/symptom', verifyToken, symptomRoutes);
-app.use('/groups', groupRoutes);
+app.use('/groups',groupRoutes);
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server listening on port ${PORT}`);

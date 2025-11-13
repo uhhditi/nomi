@@ -24,10 +24,9 @@ export async function createGroup(
   members: string[],
   createdBy?: number
 ): Promise<{ id: number; name: string }> {
-  if (!process.env.API_URL) {
+  if (!API_URL) {
     throw new Error("API URL missing (API_URL)");
   }
-  const API_URL = process.env.API_URL;
 
   // Build payload (omit createdBy if undefined)
   const payload: Record<string, unknown> = { name, members };

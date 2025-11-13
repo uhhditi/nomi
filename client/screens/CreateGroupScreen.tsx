@@ -5,6 +5,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { searchUsers, createGroup } from '../services/groupsService';
 import React from 'react';
 
+
+
 type Friend = {
   id: number;
   username: string;
@@ -22,8 +24,10 @@ export default function CreateGroupScreen() {
   const [addedMembers, setAddedMembers] = useState<Friend[]>([]);
   const [searchResults, setSearchResults] = useState<Friend[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
   
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'CreateGroup'>>();
+const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'CreateGroup'>>();
+
     // Search users as they type
   useEffect(() => {
     const searchTimeout = setTimeout(async () => {
@@ -44,49 +48,33 @@ export default function CreateGroupScreen() {
     }, 500); // Debounce search by 500ms
     return () => clearTimeout(searchTimeout);
   }, [searchQuery]);
-  // Mock suggested friends data
-  // const suggestedFriends: Friend[] = [
-  //   {
-  //     id: '1',
-  //     name: 'Sarah Wilson',
-  //     username: '@sarah_wilson',
-  //     description: 'Mutual friend with Emma',
-  //     avatar: require('../assets/pfp.png'),
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Mike Chen',
-  //     username: '@mike_chen',
-  //     description: 'Recently interacted',
-  //     avatar: require('../assets/pfp.png'),
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Alex Rodriguez',
-  //     username: '@alex_rod',
-  //     avatar: require('../assets/pfp.png'),
-  //   },
-  //   {
-  //     id: '4',
-  //     name: 'Emma Davis',
-  //     username: '@emma_davis',
-  //     description: 'Mutual friend with Sarah',
-  //     avatar: require('../assets/pfp.png'),
-  //   },
-  // ];
 
   const isAdded = (friendId: number) => {
     return addedMembers.some(member => member.id === friendId);
   };
 
-  const handleAddMember = (friend: Friend) => {
-    if (!isAdded(friend.id)) {
-      setAddedMembers([...addedMembers, friend]);
-    }
+  // const handleAddMember = (friend: Friend) => {
+  //   if (!isAdded(friend.id)) {
+  //     setAddedMembers([...addedMembers, friend]);
+  //   }
+  // };
+  const handleToggleMember = (friend: Friend) => {
+    setAddedMembers(prev => {
+      const isCurrentlyAdded = prev.some(member => member.id === friend.id);
+      
+      if (isCurrentlyAdded) {
+        // Remove the member
+        return prev.filter(member => member.id !== friend.id);
+      } else {
+        // Add the member
+        return [...prev, friend];
+      }
+    });
   };
 
+
   const handleRemoveMember = (friendId: number) => {
-    setAddedMembers(addedMembers.filter(member => member.id !== friendId));
+    setAddedMembers(prev => prev.filter(member => member.id !== friendId));
   };
 
   // const filteredFriends = suggestedFriends.filter(friend =>
@@ -95,6 +83,11 @@ export default function CreateGroupScreen() {
   // );
 
   const handleCreateGroup = async () => {
+    if (isCreating) {
+      //console.log('Already creating group, ignoring click');
+      return;
+    }
+
     if (!groupName.trim()) {
       Alert.alert('Error', 'Please enter a group name');
       return;
@@ -105,21 +98,46 @@ export default function CreateGroupScreen() {
       return;
     }
 
-    try {
-  const memberUsernames = addedMembers.map(m => m.username);
-  const result = await createGroup(groupName, memberUsernames);
-  Alert.alert('Success', `Group "${result.name}" created!`, [
-    { text: 'OK', onPress: () => navigation.goBack() }
-  ]);
-} catch (e: any) {
-  console.error('Create group error:', e);
-  Alert.alert('Error', e.message ?? 'Failed to create group.');
-}
+    if (addedMembers.some(m => !m.username)) {
+      Alert.alert('Error', 'One or more added members have invalid usernames.');
+      return;
+    }
 
+    setIsCreating(true);
+
+    try {
+      const memberUsernames = addedMembers.map(m => m.username);
+      //console.log('Creating group with:', { name: groupName, members: memberUsernames });
+      
+      const result = await createGroup(groupName, memberUsernames);
+      
+      // console.log('Group created successfully:', result);
+      
+      Alert.alert('Success', `Group "${result.name}" created!`, [
+        { 
+          text: 'OK', 
+          onPress: () => {
+            setGroupName('');
+            setAddedMembers([]);
+            setSearchQuery('');
+            setSearchResults([]);
+            navigation.navigate('Dashboard');
+          }
+        }
+      ]);
+    } catch (e: any) {
+      console.error('Create group error:', e);
+      Alert.alert(
+        'Error', 
+        e.message || 'Failed to create group. Please try again.'
+      );
+    } finally {
+      setIsCreating(false);
+    }
   };
 
 
-  return (
+return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -202,8 +220,8 @@ export default function CreateGroupScreen() {
                   </View>
                   <TouchableOpacity
                     style={[styles.addButton, added && styles.addedButton]}
-                    onPress={() => handleAddMember(friend)}
-                    disabled={added}
+                    onPress={() => handleToggleMember(friend)}
+                    activeOpacity={1}
                   >
                     <Text style={[styles.addButtonText, added && styles.addedButtonText]}>
                       {added ? 'Added' : 'Add'}
@@ -218,9 +236,12 @@ export default function CreateGroupScreen() {
 
       {/* Create Group Button */}
       <TouchableOpacity 
-        style={[styles.createButton, (!groupName.trim() || addedMembers.length === 0) && styles.createButtonDisabled]} 
+        style={[
+          styles.createButton, 
+          (!groupName.trim() || addedMembers.length === 0 || isCreating) && styles.createButtonDisabled
+        ]} 
         onPress={handleCreateGroup}
-        disabled={!groupName.trim() || addedMembers.length === 0}
+        disabled={!groupName.trim() || addedMembers.length === 0 || isCreating}
       >
         <Text style={styles.createButtonText}>Create Group</Text>
       </TouchableOpacity>
@@ -253,12 +274,6 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontFamily: 'Inter',
   },
-  nextButton: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#C9C9EE',
-    fontFamily: 'Inter',
-  },
   content: {
     flex: 1,
     paddingHorizontal: 20,
@@ -289,11 +304,15 @@ const styles = StyleSheet.create({
   },
   memberAvatarContainer: {
     position: 'relative',
+    alignItems: 'center',
   },
   memberAvatar: {
     width: 50,
     height: 50,
     borderRadius: 25,
+    backgroundColor: '#C9C9EE',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   removeButton: {
     position: 'absolute',
@@ -350,7 +369,10 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+    backgroundColor: '#C9C9EE',
     marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   friendInfo: {
     flex: 1,
@@ -368,19 +390,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     marginBottom: 2,
   },
-  friendDescription: {
-    fontSize: 12,
-    color: '#999999',
-    fontFamily: 'Inter',
-  },
   addButton: {
-    backgroundColor: '#C9C9EE',
+    backgroundColor: '#6B46C1',
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 20,
   },
   addedButton: {
-    backgroundColor: '#C9C9EE',
+    backgroundColor: '#E0E0E0',
   },
   addButtonText: {
     fontSize: 14,
@@ -389,10 +406,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
   },
   addedButtonText: {
-    color: '#FFFFFF',
+    color: '#666666',
   },
   createButton: {
-    backgroundColor: '#C9C9EE',
+    backgroundColor: '#6B46C1',
     paddingVertical: 16,
     marginHorizontal: 20,
     marginBottom: 30,
@@ -433,4 +450,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
 });
-
