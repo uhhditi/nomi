@@ -16,9 +16,12 @@ type RootStackParamList = {
   Meal: undefined;
   Symptom: undefined;
   Dashboard: undefined;
+  RoommateDashboard: undefined;
+  Fridge: undefined;
   CreateGroup: undefined;
   ChoreTracker: undefined;
   Rules: undefined;
+  NomiStart: undefined;
 };
 
 export default function StartScreen() {
@@ -61,6 +64,27 @@ export default function StartScreen() {
         onPress={() => navigation.navigate("Signup")}
       >
         <Text style={styles.buttonText}>signup</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("RoommateDashboard")}
+      >
+        <Text style={styles.buttonText}>open roommate dashboard</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("CreateGroup")}
+      >
+        <Text style={styles.buttonText}>create group</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("NomiStart")}
+      >
+        <Text style={styles.buttonText}>nomi start</Text>
       </TouchableOpacity>
 
       {/* <Text style={styles.subtitle}>log a meal - testing for now</Text>
@@ -148,5 +172,36 @@ const styles = StyleSheet.create({
     fontSize: 20, // loginSignup
     fontWeight: "400", // extrabold
     color: "#00000", // white
+  },
+  testSection: {
+    marginTop: 50,
+    paddingTop: 30,
+    borderTopWidth: 1,
+    borderTopColor: "#E0E0E0",
+    width: "100%",
+    alignItems: "center",
+  },
+  testLabel: {
+    fontFamily: "Inter",
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666666",
+    marginBottom: 12,
+  },
+  testButton: {
+    backgroundColor: "#7D60A3", // dygestPurple
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: "#DAC4F7",
+    width: 240,
+    alignItems: "center",
+  },
+  testButtonText: {
+    fontFamily: "Inter",
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
 });
