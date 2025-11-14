@@ -18,6 +18,7 @@ export default function LoginScreen() {
         Login: undefined;
         Signup: undefined;
         Dashboard: undefined;
+        RoommateDashboard: undefined;
       };
       
       const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Login'>>();
@@ -32,7 +33,7 @@ export default function LoginScreen() {
         console.log(email, password);
         const data = await login(email, password);
         if (data.accessToken || data.refreshToken) {
-          navigation.navigate("Dashboard");
+          navigation.navigate("RoommateDashboard");
         }
       } catch (error) {
         alert("wrong password or email");

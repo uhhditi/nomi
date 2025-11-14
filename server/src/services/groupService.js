@@ -1,4 +1,5 @@
 import { GroupModel } from '../models/groupModel.js'
+import pool from '../config/db.js';
 
 //handles logic
 export const GroupService = {
@@ -8,9 +9,23 @@ export const GroupService = {
         return createdGroup;
     },
 
-    // async editLog(editedLog) {
-    //     const {description, notes, date, time, userId, id} = editedLog;
-    //     const updatedLog = await LogModel.edit({ description, notes, date, time, userId, id });
-    //     return updatedLog;
-    // }
- }
+    async searchUsersByUsername(query) {
+        const { rows } = await pool.query(
+            `SELECT id, username, email
+             FROM users
+             WHERE username ILIKE $1
+             ORDER BY username
+             LIMIT 20`,
+            [`%${query}%`]
+        );
+        return rows;
+    },
+
+    async addUserToGroupByUsername({ username, groupId, addedBy = null }) {
+        const { rows } = await pool.query(
+            'SELECT * FROM add_user_to_group($1, $2, $3)',
+            [username, Number(groupId), addedBy]
+        );
+        return rows[0]; // { group_id, user_id }
+    }
+}

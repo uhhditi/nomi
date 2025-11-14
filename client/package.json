@@ -9,12 +9,14 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "^8.4.4",
     "@react-navigation/elements": "^2.5.2",
     "@react-navigation/native": "^7.1.14",
     "@react-navigation/native-stack": "^7.3.25",
     "axios": "^1.11.0",
+    "babel-preset-expo": "~54.0.0",
     "expo": "~54.0.0",
     "expo-linear-gradient": "~15.0.7",
     "expo-secure-store": "~15.0.7",
@@ -38,7 +40,8 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.1.10",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "babel-preset-expo": "^11.0.0"
   },
   "private": true
 }

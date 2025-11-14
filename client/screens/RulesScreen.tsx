@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 type Rule = {
   id: string;
@@ -14,6 +15,7 @@ type Rule = {
 type RootStackParamList = {
   Rules: undefined;
   Dashboard: undefined;
+  RoommateDashboard: undefined;
 };
 
 // Initial mock data
@@ -48,12 +50,9 @@ export default function RulesScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.headerIcon}>☑</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Roommate Rules</Text>
-        <TouchableOpacity>
-          <Text style={styles.menuIcon}>☰</Text>
+        <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('RoommateDashboard' as never)}>
+          <Ionicons name="arrow-back" size={20} color="#14141A" />
+          <Text style={styles.headerTitle}>Roommate Rules</Text>
         </TouchableOpacity>
       </View>
 
@@ -132,34 +131,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+    paddingTop: 72,
+    paddingHorizontal: 16,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 60,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  headerIcon: {
-    fontSize: 24,
-    color: '#000000',
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#000000',
     fontFamily: 'Inter',
-    textDecorationLine: 'underline',
-  },
-  menuIcon: {
-    fontSize: 24,
-    color: '#000000',
+    fontWeight: '600',
+    color: '#14141A',
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   addRuleSection: {
     backgroundColor: '#C9C9EE',
