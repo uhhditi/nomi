@@ -1,192 +1,316 @@
-import { Text, TouchableOpacity, View, ScrollView } from 'react-native';
-import { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { AuthContext } from '../context/AuthContext';
+
+type RootStackParamList = {
+  Expenses: undefined;
+  ReceiptScanner: undefined;
+  ManualEntry: undefined;
+  RoommateDashboard: undefined;
+};
 
 export default function ExpensesScreen() {
-  type PendingPayment = {
-    roommate: string;
-    amount: number;
-    description: string;
-    id: number;
-  };
-
-  type Transaction = {
-    payer: string;
-    payee: string;
-    amount: number;
-    description: string;
-    timestamp: string;
-  };
-
-  const [pendingPayments, setPendingPayments] = useState<PendingPayment[]>([
-    { id: 1, roommate: 'rm 2', amount: 12.45, description: 'eggs' }
-  ]);
-
-  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([
-    {
-      payer: 'rm 1',
-      payee: 'you',
-      amount: 45,
-      description: 'groceries',
-      timestamp: '20 min ago'
-    },
-    {
-      payer: 'rm 4',
-      payee: 'rm 3',
-      amount: 12,
-      description: 'coffee',
-      timestamp: '5 hours ago'
-    },
-    {
-      payer: 'you',
-      payee: 'rm 2',
-      amount: 19,
-      description: 'tickets!',
-      timestamp: '2 days ago'
-    }
-  ]);
-
-  type RootStackParamList = {
-    Expenses: undefined;
-    ReceiptScan: undefined;
-    ManualEntry: undefined;
-  };
-
-  const auth = useContext(AuthContext);
-
-  if (!auth) {
-    throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
-  }
-
-  const { user } = auth;
-
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Expenses'>>();
 
-  const handlePayNow = (paymentId: number) => {
-    // Handle payment logic
-    console.log('Processing payment:', paymentId);
-  };
+  // Mock data - replace with actual data from API
+  const pendingPayments = [
+    { id: '1', from: 'rm 2', amount: 12.45, description: 'eggs' },
+  ];
 
-  const handleRemovePayment = (paymentId: number) => {
-    setPendingPayments(pendingPayments.filter(p => p.id !== paymentId));
-  };
+  const recentTransactions = [
+    { id: '1', type: 'received', from: 'rm 1', amount: 45, description: 'groceries', time: '20 min ago' },
+    { id: '2', type: 'other', from: 'rm 4', to: 'rm 3', amount: 12, description: 'coffee', time: '5 hours ago' },
+    { id: '3', type: 'paid', to: 'rm 2', amount: 19, description: 'tickets', time: '2 days ago' },
+  ];
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View style={styles.container}>
       {/* Header */}
-      <View className="bg-white px-6 pt-12 pb-4 flex-row items-center justify-between border-b border-gray-200">
-        <View className="flex-row items-center">
-          <View className="w-10 h-10 rounded-full bg-black items-center justify-center mr-3">
-            <Ionicons name="cash" size={20} color="white" />
-          </View>
-          <Text className="text-2xl font-bold">Expenses</Text>
+      <View style={styles.header}>
+        <View style={styles.headerIcon}>
+          <Text style={styles.dollarSign}>$</Text>
         </View>
-        <TouchableOpacity>
-          <Ionicons name="menu" size={28} color="black" />
+        <Text style={styles.headerTitle}>Expenses</Text>
+        <TouchableOpacity onPress={() => {}}>
+          <Feather name="menu" size={20} color="#14141A" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1 px-6 pt-6">
-        {/* Add New Purchase */}
-        <Text className="text-lg font-semibold mb-4">Add a New Purchase:</Text>
-        
-        <View className="flex-row mb-8">
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Add a New Purchase Section */}
+        <Text style={styles.sectionTitle}>Add a New Purchase:</Text>
+        <View style={styles.addPurchaseRow}>
           <TouchableOpacity
-            className="flex-1 bg-gray-100 rounded-2xl p-6 items-center justify-center mr-3"
-            onPress={() => navigation.navigate('ReceiptScan')}
+            style={styles.addButton}
+            onPress={() => navigation.navigate('ReceiptScanner')}
           >
-            <Ionicons name="camera" size={40} color="black" />
-            <Text className="text-sm mt-2 text-gray-700">scan receipt</Text>
+            <Ionicons name="camera" size={24} color="#14141A" />
+            <Text style={styles.addButtonText}>scan receipt</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
-            className="flex-1 bg-gray-100 rounded-2xl p-6 items-center justify-center ml-3"
+            style={styles.addButton}
             onPress={() => navigation.navigate('ManualEntry')}
           >
-            <Ionicons name="document-text" size={40} color="black" />
-            <Text className="text-sm mt-2 text-gray-700">enter manually</Text>
+            <Feather name="file-text" size={24} color="#14141A" />
+            <Text style={styles.addButtonText}>enter manually</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Pending Payments */}
-        <Text className="text-lg font-semibold mb-4">Pending</Text>
-
+        {/* Pending Section */}
+        <Text style={styles.sectionTitle}>Pending</Text>
         {pendingPayments.length > 0 ? (
-          <View className="mb-6">
-            {pendingPayments.map((payment) => (
-              <View key={payment.id} className="bg-white rounded-xl p-4 mb-3 flex-row items-center justify-between">
-                <View className="flex-1">
-                  <Text className="text-base">
-                    <Text className="font-semibold">you owe {payment.roommate}</Text>
-                    {' '}${payment.amount.toFixed(2)} for {payment.description}
-                  </Text>
-                </View>
-                <View className="flex-row items-center">
-                  <TouchableOpacity
-                    className="bg-indigo-500 rounded-lg px-4 py-2 mr-2"
-                    onPress={() => handlePayNow(payment.id)}
-                  >
-                    <Text className="text-white font-semibold text-sm">Pay Now</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="w-8 h-8 rounded-full border-2 border-red-500 items-center justify-center"
-                    onPress={() => handleRemovePayment(payment.id)}
-                  >
-                    <Ionicons name="close" size={18} color="#ef4444" />
-                  </TouchableOpacity>
-                </View>
+          pendingPayments.map((payment) => (
+            <View key={payment.id} style={styles.pendingCard}>
+              <View style={styles.pendingContent}>
+                <Text style={styles.pendingText}>
+                  you owe {payment.from} ${payment.amount.toFixed(2)} for {payment.description}
+                </Text>
+                <TouchableOpacity style={styles.payNowButton}>
+                  <Text style={styles.payNowText}>Pay Now</Text>
+                </TouchableOpacity>
               </View>
-            ))}
-          </View>
-        ) : (
-          <View className="bg-white rounded-xl p-6 mb-6 items-center">
-            <Text className="text-gray-500">No more pending payments</Text>
-          </View>
+              <TouchableOpacity style={styles.deleteButton}>
+                <MaterialCommunityIcons name="delete" size={18} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : null}
+        {pendingPayments.length === 0 && (
+          <Text style={styles.emptyText}>No more pending payments</Text>
         )}
 
-        {/* Recent Transactions */}
-        <Text className="text-lg font-semibold mb-4">Recent Transactions</Text>
-
-        <View className="mb-6">
-          {recentTransactions.map((transaction, index) => (
-            <View key={index} className="bg-white rounded-xl p-4 mb-3 flex-row items-center">
-              <View className="w-10 h-10 rounded-full bg-black items-center justify-center mr-3">
-                <Ionicons name="cash" size={20} color="white" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-base">
-                  <Text className="font-semibold">{transaction.payer} paid {transaction.payee}</Text>
-                  {' '}${transaction.amount} for {transaction.description}
-                </Text>
-                <Text className="text-sm text-gray-500 mt-1">{transaction.timestamp}</Text>
-              </View>
+        {/* Recent Transactions Section */}
+        <Text style={styles.sectionTitle}>Recent Transactions</Text>
+        {recentTransactions.map((transaction) => (
+          <View key={transaction.id} style={styles.transactionCard}>
+            <View style={styles.transactionIcon}>
+              <Text style={styles.transactionDollarSign}>$</Text>
             </View>
-          ))}
-        </View>
+            <View style={styles.transactionContent}>
+              <Text style={styles.transactionText}>
+                {transaction.type === 'received' && `${transaction.from} paid you $${transaction.amount} for ${transaction.description}`}
+                {transaction.type === 'paid' && `you paid ${transaction.to} $${transaction.amount} for ${transaction.description}!`}
+                {transaction.type === 'other' && `${transaction.from} paid ${transaction.to} $${transaction.amount} for ${transaction.description}`}
+              </Text>
+              <Text style={styles.transactionTime}>{transaction.time}</Text>
+            </View>
+          </View>
+        ))}
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View className="bg-white border-t border-gray-200 flex-row items-center justify-around py-4">
-        <TouchableOpacity className="items-center">
-          <Ionicons name="menu" size={24} color="black" />
+      <View style={styles.bottomBar}>
+        <TouchableOpacity onPress={() => {}}>
+          <Feather name="menu" size={20} color="#14141A" />
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-          <Ionicons name="receipt" size={24} color="black" />
+        <TouchableOpacity onPress={() => {}}>
+          <Feather name="grid" size={20} color="#14141A" />
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-          <Ionicons name="home" size={24} color="black" />
+        <TouchableOpacity style={styles.navHome} onPress={() => navigation.navigate('RoommateDashboard')}>
+          <Ionicons name="home" size={18} color="#FFFFFF" />
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-          <Ionicons name="person" size={24} color="black" />
+        <TouchableOpacity onPress={() => {}}>
+          <Ionicons name="person-circle-outline" size={22} color="#14141A" />
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-          <Ionicons name="people" size={24} color="black" />
+        <TouchableOpacity onPress={() => {}}>
+          <Ionicons name="people-outline" size={22} color="#14141A" />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+const BORDER = '#E4E3EE';
+const CTA = '#7D60A3';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingTop: 56,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  headerIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  dollarSign: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#14141A',
+    fontFamily: 'Inter',
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#14141A',
+    fontFamily: 'Inter',
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 88,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Inter',
+    color: '#14141A',
+    marginTop: 20,
+    marginBottom: 12,
+  },
+  addPurchaseRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  addButton: {
+    width: '48%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonText: {
+    marginTop: 8,
+    fontSize: 13,
+    fontWeight: '500',
+    fontFamily: 'Inter',
+    color: '#14141A',
+  },
+  pendingCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 14,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  pendingContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  pendingText: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: 'Inter',
+    fontWeight: '500',
+    color: '#14141A',
+    marginRight: 12,
+  },
+  payNowButton: {
+    backgroundColor: CTA,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  payNowText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: 'Inter',
+  },
+  deleteButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FF3B30',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
+  },
+  emptyText: {
+    fontSize: 13,
+    fontFamily: 'Inter',
+    fontWeight: '400',
+    color: '#8E8E93',
+    fontStyle: 'italic',
+    marginBottom: 8,
+  },
+  transactionCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: BORDER,
+    padding: 14,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  transactionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: CTA,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  transactionDollarSign: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    fontFamily: 'Inter',
+  },
+  transactionContent: {
+    flex: 1,
+  },
+  transactionText: {
+    fontSize: 14,
+    fontFamily: 'Inter',
+    fontWeight: '500',
+    color: '#14141A',
+    marginBottom: 4,
+  },
+  transactionTime: {
+    fontSize: 12,
+    fontFamily: 'Inter',
+    fontWeight: '400',
+    color: '#8E8E93',
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 8,
+    left: 0,
+    right: 0,
+    height: 64,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: BORDER,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  navHome: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#14141A',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
