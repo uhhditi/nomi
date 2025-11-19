@@ -1,5 +1,5 @@
 import { Button, StyleSheet, Text, TouchableOpacity, TextInput, View, Keyboard, TouchableWithoutFeedback } from 'react-native';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
@@ -9,6 +9,10 @@ import { AuthContext } from '../context/AuthContext';
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    
+    useEffect(() => {
+      console.log("LoginScreen component mounted");
+    }, []);
 
     const auth = useContext(AuthContext);
 
@@ -28,7 +32,9 @@ export default function LoginScreen() {
     }
 
     const { login } = auth;
-    async function handleLogin() {
+    const handleLogin = async () => {
+      console.log("in handle login");
+      alert("Button pressed!"); // Test if button works
       try {
         console.log(email, password);
         const data = await login(email, password);
@@ -38,7 +44,7 @@ export default function LoginScreen() {
       } catch (error) {
         alert("wrong password or email");
       }
-    }
+    };
   
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -60,8 +66,12 @@ export default function LoginScreen() {
             style={styles.logInEntry}
           />
       
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.button}>ready to login!</Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={handleLogin}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.buttonText}>ready to login!</Text>
           </TouchableOpacity> 
         </View>
       </TouchableWithoutFeedback>
@@ -104,7 +114,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
+    backgroundColor: "#D8F793", // green
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
     marginTop: 10,
+    width: 240,
+    alignItems: "center",
+  },
+  buttonText: {
     fontFamily: "Inter",
     fontSize: 20,
     fontWeight: "700",   // bold

@@ -29,13 +29,27 @@ export default function NomiStartScreen() {
   const { login, register } = auth;
 
   const handleSignIn = async () => {
-    // For now, just navigate to dashboard without authentication check
-    navigation.navigate('RoommateDashboard');
+    try {
+      console.log(email, password);
+      const data = await login(email, password);
+      if (data.accessToken || data.refreshToken) {
+        navigation.navigate("RoommateDashboard");
+      }
+    } catch (error) {
+      alert("wrong password or email");
+    }
+    // navigation.navigate('RoommateDashboard');
   };
 
   const handleSignUp = async () => {
     // For now, just navigate to group workflow without authentication check
-    navigation.navigate('GroupWorkflow');
+    try {
+      const data = await register(email, password, username, username);  
+      console.log("register data", data); 
+    } catch (err) {
+      console.error(err);
+    }
+    navigation.navigate("GroupWorkflow");
   };
 
   return (
