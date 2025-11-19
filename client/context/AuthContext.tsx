@@ -5,7 +5,7 @@ import { IP_ADDRESS, PORT } from '@env';
 interface AuthProps {
   // authState?: {token: string | null; authenticated: boolean | null};
   user?: {name: string, email: string, password: string | null, id: number} | null;
-  register: ( email: string, password: string, first: string, last: string ) => Promise<any>;
+  register: ( email: string, password: string, username: string, first: string, last: string ) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<any>;
 }
@@ -46,12 +46,12 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
-  const register = async (email: string, password: string, first: string, last: string) => {
+  const register = async (email: string, password: string, username: string, first: string, last: string) => {
     try {
         const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({email, password, first, last}),
+            body: JSON.stringify({email, password, username, first, last}),
         });
 
         console.log("Response status:", response.status);

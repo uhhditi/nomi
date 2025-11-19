@@ -44,7 +44,7 @@ export default function NomiStartScreen() {
   const handleSignUp = async () => {
     // For now, just navigate to group workflow without authentication check
     try {
-      const data = await register(email, password, username, username);  
+      const data = await register(email, password, username, username, username);  
       console.log("register data", data); 
     } catch (err) {
       console.error(err);
