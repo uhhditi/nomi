@@ -33,23 +33,22 @@ export default function NomiStartScreen() {
       console.log(email, password);
       const data = await login(email, password);
       if (data.accessToken || data.refreshToken) {
-        navigation.navigate("RoommateDashboard");
+        navigation.navigate('CreateGroup' as never);
       }
     } catch (error) {
       alert("wrong password or email");
     }
-    // navigation.navigate('RoommateDashboard');
   };
 
   const handleSignUp = async () => {
-    // For now, just navigate to group workflow without authentication check
     try {
       const data = await register(email, password, username, username, username);  
-      console.log("register data", data); 
+      console.log("register data", data);
+      navigation.navigate('CreateGroup' as never);
     } catch (err) {
       console.error(err);
+      alert("Sign up failed. Please try again.");
     }
-    navigation.navigate("GroupWorkflow");
   };
 
   return (
