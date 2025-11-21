@@ -28,7 +28,7 @@ export default function SignupScreen() {
     const { register } = auth;
     async function handleSignup() {
         try {
-          const data = await register(name, email, password); 
+          const data = await register(email, password, name, name); 
           console.log("register data", data); 
         } catch (err) {
           console.error(err);

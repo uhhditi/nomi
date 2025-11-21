@@ -15,6 +15,7 @@ export const UserController = {
     },
 
     async loginUser(req, res){
+        console.log("in backend")
         console.log("incoming user body:", req.body);
         try {
             const newLogin = await UserService.loginUser(req.body.email, req.body.password);

@@ -19,6 +19,10 @@ import RulesScreen from './screens/RulesScreen';
 import NomiStartScreen from './screens/NomiStartScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import GroupWorkflowScreen from './screens/GroupWorkflowScreen';
+import ExpensesScreen from './screens/ExpensesScreen';
+import ReceiptScannerScreen from './screens/ReceiptScannerScreen';
+import ReceiptReviewScreen from './screens/ReceiptReviewScreen';
+import ManualEntryScreen from './screens/ManualEntryScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -36,6 +40,10 @@ type RootStackParamList = {
   NomiStart: undefined;
   Settings: undefined;
   GroupWorkflow: undefined;
+  Expenses: undefined;
+  ReceiptScanner: undefined;
+  ReceiptReview: { items: Array<{ name: string; quantity: number; price: number }> };
+  ManualEntry: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -100,6 +108,14 @@ export default function App() {
         <Stack.Screen name="Settings" component={SettingsScreen}
         options={{ headerShown: false }} />
         <Stack.Screen name="GroupWorkflow" component={GroupWorkflowScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="Expenses" component={ExpensesScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="ReceiptScanner" component={ReceiptScannerScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="ReceiptReview" component={ReceiptReviewScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="ManualEntry" component={ManualEntryScreen}
         options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
