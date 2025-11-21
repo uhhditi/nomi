@@ -2,7 +2,8 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Image,
 import { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { searchUsers, createGroup } from '../services/groupsService';
+import { searchUsers, createGroup, listGroupsForUser } from '../services/groupsService';
+import { useAuth } from '../context/AuthContext';
 import React from 'react';
 
 
@@ -16,6 +17,7 @@ type Friend = {
 type RootStackParamList = {
   CreateGroup: undefined;
   Dashboard: undefined;
+  RoommateDashboard: undefined;
 };
 
 export default function CreateGroupScreen() {
@@ -24,11 +26,37 @@ export default function CreateGroupScreen() {
   const [addedMembers, setAddedMembers] = useState<Friend[]>([]);
   const [searchResults, setSearchResults] = useState<Friend[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-    const [isCreating, setIsCreating] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [hasGroups, setHasGroups] = useState(false);
+  const [isCheckingGroups, setIsCheckingGroups] = useState(true);
   
-const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'CreateGroup'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'CreateGroup'>>();
+  const auth = useAuth();
+  const user = auth?.user;
 
-    // Search users as they type
+  // Check if user has any groups
+  useEffect(() => {
+    const checkUserGroups = async () => {
+      if (!user?.id) {
+        setIsCheckingGroups(false);
+        return;
+      }
+      
+      try {
+        const groups = await listGroupsForUser(user.id);
+        setHasGroups(groups.length > 0);
+      } catch (error) {
+        console.error('Error checking user groups:', error);
+        setHasGroups(false);
+      } finally {
+        setIsCheckingGroups(false);
+      }
+    };
+
+    checkUserGroups();
+  }, [user?.id]);
+
+  // Search users as they type
   useEffect(() => {
     const searchTimeout = setTimeout(async () => {
       if (searchQuery.trim().length > 0) {
@@ -149,6 +177,20 @@ return (
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Already Have a Group Section - Only show if user has groups */}
+        {!isCheckingGroups && hasGroups && (
+          <View style={styles.alreadyHaveGroupSection}>
+            <Text style={styles.alreadyHaveGroupText}>Already have a group?</Text>
+            <TouchableOpacity 
+              style={styles.skipButton}
+              onPress={() => navigation.navigate('RoommateDashboard')}
+            >
+              <Text style={styles.skipButtonText}>Skip to Dashboard</Text>
+            </TouchableOpacity>
+            <View style={styles.divider} />
+          </View>
+        )}
+
         {/* Group Name Input */}
         <TextInput
           placeholder="Group name"
@@ -277,6 +319,35 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+  },
+  alreadyHaveGroupSection: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  alreadyHaveGroupText: {
+    fontSize: 14,
+    fontFamily: 'Inter',
+    fontWeight: '500',
+    color: '#999999',
+    marginBottom: 12,
+  },
+  skipButton: {
+    backgroundColor: '#3F3F96',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  skipButtonText: {
+    fontSize: 14,
+    fontFamily: 'Inter',
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  divider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#E4E3EE',
   },
   groupNameInput: {
     backgroundColor: '#F5F5F5',

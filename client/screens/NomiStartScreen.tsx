@@ -29,13 +29,13 @@ export default function NomiStartScreen() {
   const { login, register } = auth;
 
   const handleSignIn = async () => {
-    // For now, just navigate to dashboard without authentication check
-    navigation.navigate('RoommateDashboard');
+    // Navigate to CreateGroup screen
+    navigation.navigate('CreateGroup' as never);
   };
 
   const handleSignUp = async () => {
-    // For now, just navigate to group workflow without authentication check
-    navigation.navigate('GroupWorkflow');
+    // Navigate to CreateGroup screen
+    navigation.navigate('CreateGroup' as never);
   };
 
   return (
