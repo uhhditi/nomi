@@ -30,7 +30,7 @@ router.get('/:groupId/members', async (req, res) => {
 
 // Create a new group
 router.post('/', async (req, res) => {
-    console.log('POST /groups body =>', req.body);
+  console.log('POST /groups body =>', req.body);
   const { name, members = [], createdBy = null } = req.body || {};
   if (!name?.trim()) return res.status(400).json({ error: 'name is required' });
 
