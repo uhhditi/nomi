@@ -29,13 +29,26 @@ export default function NomiStartScreen() {
   const { login, register } = auth;
 
   const handleSignIn = async () => {
-    // Navigate to CreateGroup screen
-    navigation.navigate('CreateGroup' as never);
+    try {
+      console.log(email, password);
+      const data = await login(email, password);
+      if (data.accessToken || data.refreshToken) {
+        navigation.navigate('CreateGroup' as never);
+      }
+    } catch (error) {
+      alert("wrong password or email");
+    }
   };
 
   const handleSignUp = async () => {
-    // Navigate to CreateGroup screen
-    navigation.navigate('CreateGroup' as never);
+    try {
+      const data = await register(email, password, username, username, username);  
+      console.log("register data", data);
+      navigation.navigate('CreateGroup' as never);
+    } catch (err) {
+      console.error(err);
+      alert("Sign up failed. Please try again.");
+    }
   };
 
   return (

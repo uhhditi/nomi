@@ -2,12 +2,12 @@ import { IP_ADDRESS, PORT } from '@env'
 import { useState, useContext } from 'react';
 import { apiCall, storeRefreshToken, storeToken } from './authService';
 
-export async function setUser(name: string, email: string, password: string) {
+export async function setUser( email: string, password: string, first: string, last: string) {
   // const response = await apiCall(`user/`, 'POST');
     const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({name, email, password}),
+        body: JSON.stringify({email, password, first, last}),
       });
       if (!response.ok) {
         const errorData = await response.json();
