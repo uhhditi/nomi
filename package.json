@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@clerk/clerk-expo": "^2.18.1",
     "@react-native-community/datetimepicker": "^8.4.3",
     "expo": "^53.0.20",
     "expo-linear-gradient": "~14.1.5",

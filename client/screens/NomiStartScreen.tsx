@@ -1,9 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthContext } from '../context/AuthContext';
+import { listGroupsForUser } from '../services/groupsService';
 
 type RootStackParamList = {
   RoommateDashboard: undefined;
@@ -16,8 +17,9 @@ export default function NomiStartScreen() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'NomiStart'>>();
   const auth = useContext(AuthContext);
@@ -26,14 +28,41 @@ export default function NomiStartScreen() {
     throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
   }
 
-  const { login, register } = auth;
+  const { login, register, user } = auth;
+
+  // Check if user already has a group after login/register
+  useEffect(() => {
+    const checkGroups = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const groups = await listGroupsForUser(user.id);
+        if (groups.length > 0) {
+          // User already in a group, go straight to dashboard
+          navigation.navigate('RoommateDashboard' as never);
+        } else {
+          // User has no group, go to join/create screen
+          navigation.navigate('JoinOrCreateGroup' as never);
+        }
+      } catch (error) {
+        // Error checking groups, go to join/create screen as fallback
+        console.error('Error checking groups:', error);
+        navigation.navigate('JoinOrCreateGroup' as never);
+      }
+    };
+
+    if (user?.id) {
+      checkGroups();
+    }
+  }, [user?.id, navigation]);
 
   const handleSignIn = async () => {
     try {
-      console.log(email, password);
       const data = await login(email, password);
       if (data.accessToken || data.refreshToken) {
-        navigation.navigate('CreateGroup' as never);
+        // Navigation will be handled by useEffect when user is set
+        // If no group, user will stay on this screen or go to JoinOrCreateGroup
+        // If has group, useEffect will navigate to RoommateDashboard
       }
     } catch (error) {
       alert("wrong password or email");
@@ -41,10 +70,14 @@ export default function NomiStartScreen() {
   };
 
   const handleSignUp = async () => {
+    if (!firstName.trim() || !lastName.trim()) {
+      alert("Please enter your first and last name");
+      return;
+    }
     try {
-      const data = await register(email, password, username, username, username);  
-      console.log("register data", data);
-      navigation.navigate('CreateGroup' as never);
+      const data = await register(email, password, firstName.trim(), lastName.trim());
+      // Navigation will be handled by useEffect when user is set
+      // New users won't have a group, so they'll need to create/join one
     } catch (err) {
       console.error(err);
       alert("Sign up failed. Please try again.");
@@ -80,11 +113,11 @@ export default function NomiStartScreen() {
 
         {mode === 'signin' ? (
           <>
-            {/* Username/email */}
-            <Text style={styles.label}>Username or Email</Text>
+            {/* Email */}
+            <Text style={styles.label}>Email</Text>
             <View style={styles.inputRow}>
               <TextInput 
-                placeholder="Enter your username or email" 
+                placeholder="Enter your email" 
                 placeholderTextColor="#9AA0A6" 
                 style={styles.input}
                 value={email}
@@ -140,16 +173,29 @@ export default function NomiStartScreen() {
           </>
         ) : (
           <>
-            {/* Username */}
-            <Text style={styles.label}>Username</Text>
+            {/* First Name */}
+            <Text style={styles.label}>First Name</Text>
             <View style={styles.inputRow}>
               <TextInput 
-                placeholder="Enter username" 
+                placeholder="Enter first name" 
                 placeholderTextColor="#9AA0A6" 
                 style={styles.input}
-                value={username}
-                onChangeText={setUsername}
-                autoCapitalize="none"
+                value={firstName}
+                onChangeText={setFirstName}
+                autoCapitalize="words"
+              />
+              <Ionicons name="person-outline" size={18} color="#14141A" />
+            </View>
+            {/* Last Name */}
+            <Text style={styles.label}>Last Name</Text>
+            <View style={styles.inputRow}>
+              <TextInput 
+                placeholder="Enter last name" 
+                placeholderTextColor="#9AA0A6" 
+                style={styles.input}
+                value={lastName}
+                onChangeText={setLastName}
+                autoCapitalize="words"
               />
               <Ionicons name="person-outline" size={18} color="#14141A" />
             </View>

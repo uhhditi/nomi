@@ -4,7 +4,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import SignupScreen from './screens/SignupScreen';
-import LoginScreen from './screens/LoginScreen';
 //import { setUser } from './services/userService';
 import StartScreen from './screens/StartScreen';
 import MealScreen from './screens/MealScreen';
@@ -19,6 +18,9 @@ import RulesScreen from './screens/RulesScreen';
 import NomiStartScreen from './screens/NomiStartScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import GroupWorkflowScreen from './screens/GroupWorkflowScreen';
+import ManageGroupScreen from './screens/ManageGroupScreen';
+import JoinOrCreateGroupScreen from './screens/JoinOrCreateGroupScreen';
+import JoinGroupScreen from './screens/JoinGroupScreen';
 import ExpensesScreen from './screens/ExpensesScreen';
 import ReceiptScannerScreen from './screens/ReceiptScannerScreen';
 import ReceiptReviewScreen from './screens/ReceiptReviewScreen';
@@ -26,7 +28,6 @@ import ManualEntryScreen from './screens/ManualEntryScreen';
 
 type RootStackParamList = {
   Home: undefined;
-  Login: undefined;
   Start: undefined;
   Signup: undefined;
   Meal: undefined;
@@ -40,6 +41,9 @@ type RootStackParamList = {
   NomiStart: undefined;
   Settings: undefined;
   GroupWorkflow: undefined;
+  JoinOrCreateGroup: undefined;
+  JoinGroup: undefined;
+  ManageGroup: undefined;
   Expenses: undefined;
   ReceiptScanner: undefined;
   ReceiptReview: { items: Array<{ name: string; quantity: number; price: number }> };
@@ -68,9 +72,8 @@ function HomeScreen() {
   // }, []);
   
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text>Home Screen</Text>
-      <Button title="Go to Login" onPress={() => navigation.navigate('Login')} />
       <Button title="SignUp" onPress={() => navigation.navigate('Signup')} />
     </View>
   );
@@ -83,7 +86,6 @@ export default function App() {
       <Stack.Navigator initialRouteName="NomiStart">
         <Stack.Screen name="Home" component={HomeScreen} 
         options={{ headerShown: false }}/>
-        <Stack.Screen name="Login" component={LoginScreen}/>
         <Stack.Screen name="Signup" component={SignupScreen}/>
         <Stack.Screen name="Dashboard" component={DashboardScreen}
         options={{ headerShown: false }}/>
@@ -108,6 +110,12 @@ export default function App() {
         <Stack.Screen name="Settings" component={SettingsScreen}
         options={{ headerShown: false }} />
         <Stack.Screen name="GroupWorkflow" component={GroupWorkflowScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="JoinOrCreateGroup" component={JoinOrCreateGroupScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="JoinGroup" component={JoinGroupScreen}
+        options={{ headerShown: false }} />
+        <Stack.Screen name="ManageGroup" component={ManageGroupScreen}
         options={{ headerShown: false }} />
         <Stack.Screen name="Expenses" component={ExpensesScreen}
         options={{ headerShown: false }} />

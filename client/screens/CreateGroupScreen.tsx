@@ -10,7 +10,6 @@ import React from 'react';
 
 type Friend = {
   id: number;
-  username: string;
   email: string;
 };
 
@@ -34,7 +33,7 @@ export default function CreateGroupScreen() {
   const auth = useAuth();
   const user = auth?.user;
 
-  // Check if user has any groups
+  // Check if user has any groups - if they do, redirect to dashboard
   useEffect(() => {
     const checkUserGroups = async () => {
       if (!user?.id) {
@@ -44,7 +43,12 @@ export default function CreateGroupScreen() {
       
       try {
         const groups = await listGroupsForUser(user.id);
-        setHasGroups(groups.length > 0);
+        if (groups.length > 0) {
+          // User already in a group, redirect to dashboard
+          navigation.navigate('RoommateDashboard' as never);
+          return;
+        }
+        setHasGroups(false);
       } catch (error) {
         console.error('Error checking user groups:', error);
         setHasGroups(false);
@@ -54,7 +58,7 @@ export default function CreateGroupScreen() {
     };
 
     checkUserGroups();
-  }, [user?.id]);
+  }, [user?.id, navigation]);
 
   // Search users as they type
   useEffect(() => {
@@ -121,23 +125,19 @@ export default function CreateGroupScreen() {
       return;
     }
 
-    if (addedMembers.length === 0) {
-      Alert.alert('Error', 'Please add at least one member');
-      return;
-    }
-
-    if (addedMembers.some(m => !m.username)) {
-      Alert.alert('Error', 'One or more added members have invalid usernames.');
+    // Allow creating group with no members - creator will be automatically added
+    if (addedMembers.some(m => !m.email)) {
+      Alert.alert('Error', 'One or more added members have invalid emails.');
       return;
     }
 
     setIsCreating(true);
 
     try {
-      const memberUsernames = addedMembers.map(m => m.username);
-      //console.log('Creating group with:', { name: groupName, members: memberUsernames });
+      const memberEmails = addedMembers.map(m => m.email);
+      //console.log('Creating group with:', { name: groupName, members: memberEmails });
       
-      const result = await createGroup(groupName, memberUsernames);
+      const result = await createGroup(groupName, memberEmails);
       
       // console.log('Group created successfully:', result);
       
@@ -149,7 +149,7 @@ export default function CreateGroupScreen() {
             setAddedMembers([]);
             setSearchQuery('');
             setSearchResults([]);
-            navigation.navigate('Dashboard');
+            navigation.navigate('RoommateDashboard' as never);
           }
         }
       ]);
@@ -204,7 +204,7 @@ return (
         <View style={styles.section}>
           <Text style={styles.sectionText}>
             {addedMembers.length === 0 
-              ? 'Add members to get started.' 
+              ? 'No members added yet (you can add members later)' 
               : `${addedMembers.length} member(s) added`}
           </Text>
           <View style={styles.addedMembersContainer}>
@@ -212,7 +212,7 @@ return (
               <View key={member.id} style={styles.memberAvatarContainer}>
                 <View style={styles.memberAvatar}>
                   <Text style={styles.memberInitial}>
-                    {member.username[0].toUpperCase()}
+                    {member.email[0].toUpperCase()}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -221,7 +221,7 @@ return (
                 >
                   <Text style={styles.removeButtonText}>×</Text>
                 </TouchableOpacity>
-                <Text style={styles.memberUsername}>{member.username}</Text>
+                <Text style={styles.memberEmail}>{member.email}</Text>
               </View>
             ))}
           </View>
@@ -231,7 +231,7 @@ return (
         <View style={styles.searchContainer}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
-            placeholder="Search usernames..."
+            placeholder="Search by email..."
             placeholderTextColor="#999999"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -253,12 +253,11 @@ return (
                 <View key={friend.id} style={styles.friendItem}>
                   <View style={styles.friendAvatar}>
                     <Text style={styles.avatarInitial}>
-                      {friend.username[0].toUpperCase()}
+                      {friend.email[0].toUpperCase()}
                     </Text>
                   </View>
                   <View style={styles.friendInfo}>
-                    <Text style={styles.friendName}>{friend.username}</Text>
-                    <Text style={styles.friendUsername}>{friend.email}</Text>
+                    <Text style={styles.friendName}>{friend.email}</Text>
                   </View>
                   <TouchableOpacity
                     style={[styles.addButton, added && styles.addedButton]}
@@ -280,10 +279,10 @@ return (
       <TouchableOpacity 
         style={[
           styles.createButton, 
-          (!groupName.trim() || addedMembers.length === 0 || isCreating) && styles.createButtonDisabled
+          (!groupName.trim() || isCreating) && styles.createButtonDisabled
         ]} 
         onPress={handleCreateGroup}
-        disabled={!groupName.trim() || addedMembers.length === 0 || isCreating}
+        disabled={!groupName.trim() || isCreating}
       >
         <Text style={styles.createButtonText}>Create Group</Text>
       </TouchableOpacity>
@@ -455,7 +454,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     marginBottom: 2,
   },
-  friendUsername: {
+  friendEmail: {
     fontSize: 14,
     color: '#666666',
     fontFamily: 'Inter',
@@ -505,7 +504,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
   },
-  memberUsername: {
+  memberEmail: {
     fontSize: 10,
     color: '#666666',
     fontFamily: 'Inter',
