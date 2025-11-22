@@ -52,7 +52,7 @@ export default function StartScreen() {
 
       <TouchableOpacity
         style={styles.logInbutton}
-        onPress={() => navigation.navigate("Login")}
+        onPress={() => navigation.navigate("NomiStart")}
       >
         <Text style={styles.buttonText}>login</Text>
       </TouchableOpacity>

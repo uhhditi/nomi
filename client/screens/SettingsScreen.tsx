@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
+import { listGroupsForUser, leaveGroup } from '../services/groupsService';
 
 type RootStackParamList = {
   RoommateDashboard: undefined;
@@ -11,16 +12,41 @@ type RootStackParamList = {
   Login: undefined;
   Settings: undefined;
   NomiStart: undefined;
+  JoinOrCreateGroup: undefined;
 };
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Settings'>>();
   const { user, logout } = useAuth();
+  const [groupInfo, setGroupInfo] = useState<{ id: number; name: string } | null>(null);
+
+  // Load user's group
+  useEffect(() => {
+    const loadGroup = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const groups = await listGroupsForUser(user.id);
+        if (groups.length > 0) {
+          setGroupInfo(groups[0]);
+        }
+      } catch (error) {
+        console.error('Error loading group:', error);
+      }
+    };
+
+    loadGroup();
+  }, [user?.id]);
 
   const handleLeaveGroup = () => {
+    if (!groupInfo) {
+      Alert.alert('Error', 'No group found');
+      return;
+    }
+
     Alert.alert(
       'Leave Group',
-      'Are you sure you want to leave this group?',
+      'Are you sure you want to leave this group? You will need to be invited again to rejoin.',
       [
         {
           text: 'Cancel',
@@ -29,9 +55,21 @@ export default function SettingsScreen() {
         {
           text: 'Leave',
           style: 'destructive',
-          onPress: () => {
-            // TODO: Implement leave group functionality
-            Alert.alert('Success', 'You have left the group');
+          onPress: async () => {
+            try {
+              await leaveGroup(groupInfo.id);
+              Alert.alert('Success', 'You have left the group', [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    // Navigate to join/create group screen
+                    navigation.navigate('JoinOrCreateGroup' as never);
+                  }
+                }
+              ]);
+            } catch (error: any) {
+              Alert.alert('Error', error.message || 'Failed to leave group. Please try again.');
+            }
           },
         },
       ]

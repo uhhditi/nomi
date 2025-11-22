@@ -1,21 +1,22 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import { useRef } from 'react';
 import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
+import { getChores, createChore, toggleChoreCompleted, type Chore as BackendChore } from '../services/choreService';
+import { AuthContext } from '../context/AuthContext';
+import { listGroupsForUser } from '../services/groupsService';
 
 type Chore = {
-  id: string;
+  choreId: number;
   title: string;
   description: string;
-  assignedTo: string;
   dueTime: string;
   dueDate: Date;
-  status: 'pending' | 'completed' | 'overdue';
+  completed: boolean;
 };
 
 type RootStackParamList = {
@@ -24,70 +25,33 @@ type RootStackParamList = {
   RoommateDashboard: undefined;
 };
 
-const MOCK_ROOMMATES = ['roommate 1', 'roommate 2', 'roommate 3', 'roommate 4'];
-
-// Initial mock data for demonstration
-const getInitialMockChores = (): Chore[] => {
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-
-  // Create mock chores
-  const chore1: Chore = {
-    id: '1',
-    title: 'Clean Kitchen',
-    description: 'dishes, counter, sink',
-    assignedTo: 'roommate 1',
-    dueTime: '6:00 PM',
-    dueDate: (() => {
-      const date = new Date(today);
-      date.setHours(18, 0, 0, 0);
-      return date;
-    })(),
-    status: 'pending',
+// Convert backend chore to frontend format
+const convertBackendChore = (backendChore: any): Chore => {
+  // Handle both snake_case (from raw DB) and camelCase (from service)
+  const choreId = backendChore.choreId || backendChore.chore_id;
+  const dueDateValue = backendChore.dueDate || backendChore.due_date;
+  const dueDate = typeof dueDateValue === 'string' 
+    ? new Date(dueDateValue) 
+    : dueDateValue;
+  
+  return {
+    choreId: choreId,
+    title: backendChore.title,
+    description: backendChore.description || '',
+    dueTime: dueDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+    dueDate: dueDate,
+    completed: backendChore.completed,
   };
-
-  const chore2: Chore = {
-    id: '2',
-    title: 'Take Out Trash',
-    description: 'kitchen and bathroom bins',
-    assignedTo: 'roommate 2',
-    dueTime: '10:00 AM',
-    dueDate: (() => {
-      const date = new Date(today);
-      date.setHours(10, 0, 0, 0);
-      if (date < new Date()) {
-        date.setDate(date.getDate() - 1); // Make it yesterday so it shows as completed
-      }
-      return date;
-    })(),
-    status: 'completed',
-  };
-
-  const chore3: Chore = {
-    id: '3',
-    title: 'Clean Bathroom',
-    description: 'toilet, shower, mirror',
-    assignedTo: 'roommate 4',
-    dueTime: '2:00 PM',
-    dueDate: (() => {
-      const date = new Date(yesterday);
-      date.setHours(14, 0, 0, 0);
-      return date;
-    })(),
-    status: 'overdue',
-  };
-
-  return [chore1, chore2, chore3];
 };
 
 export default function ChoreTrackerScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [chores, setChores] = useState<Chore[]>(getInitialMockChores());
+  const [chores, setChores] = useState<Chore[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [groupId, setGroupId] = useState<number | null>(null);
   const [newChoreTitle, setNewChoreTitle] = useState('');
   const [newChoreDescription, setNewChoreDescription] = useState('');
   const [newChoreDueTime, setNewChoreDueTime] = useState(new Date());
-  const [newChoreAssignedTo, setNewChoreAssignedTo] = useState('');
   const [newChoreDate, setNewChoreDate] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -95,6 +59,58 @@ export default function ChoreTrackerScreen() {
   const refRBSheet = useRef<any>(null);
   
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'ChoreTracker'>>();
+  const auth = useContext(AuthContext);
+  
+  if (!auth) {
+    throw new Error("AuthContext is undefined. Make sure you're inside an AuthProvider.");
+  }
+
+  const { user } = auth;
+
+  // Fetch user's groups and set the first one, then load chores
+  useEffect(() => {
+    const initializeGroup = async () => {
+      try {
+        if (!user?.id) {
+          Alert.alert('Error', 'Please log in to view chores.');
+          return;
+        }
+
+        // Get user's groups
+        const groups = await listGroupsForUser(user.id);
+        if (groups.length === 0) {
+          Alert.alert('No Group', 'You need to be in a group to view chores. Please create or join a group first.');
+          setLoading(false);
+          return;
+        }
+
+        // Use the first group
+        const firstGroupId = groups[0].id;
+        setGroupId(firstGroupId);
+        await loadChores(firstGroupId);
+      } catch (error) {
+        console.error('Error initializing group:', error);
+        Alert.alert('Error', 'Failed to load group information.');
+        setLoading(false);
+      }
+    };
+
+    initializeGroup();
+  }, [user]);
+
+  const loadChores = async (group: number) => {
+    try {
+      setLoading(true);
+      const backendChores = await getChores(group);
+      const convertedChores = backendChores.map(convertBackendChore);
+      setChores(convertedChores);
+    } catch (error) {
+      console.error('Error loading chores:', error);
+      Alert.alert('Error', 'Failed to load chores. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Get current week dates
   const getWeekDates = () => {
@@ -150,44 +166,57 @@ export default function ChoreTrackerScreen() {
     setNewChoreDate(date);
   };
 
-  const handleAddChore = () => {
-    if (!newChoreTitle || !newChoreAssignedTo) return;
-
-    const dueDateTime = new Date(newChoreDate);
-    dueDateTime.setHours(newChoreDueTime.getHours());
-    dueDateTime.setMinutes(newChoreDueTime.getMinutes());
-
-    const now = new Date();
-    let status: 'pending' | 'completed' | 'overdue' = 'pending';
-    if (dueDateTime < now) {
-      status = 'overdue';
+  const handleAddChore = async () => {
+    if (!newChoreTitle) {
+      Alert.alert('Validation Error', 'Please fill in the chore title.');
+      return;
     }
 
-    const newChore: Chore = {
-      id: Date.now().toString(),
-      title: newChoreTitle,
-      description: newChoreDescription,
-      assignedTo: newChoreAssignedTo,
-      dueTime: newChoreDueTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-      dueDate: dueDateTime,
-      status,
-    };
+    if (!groupId) {
+      Alert.alert('Error', 'No group selected.');
+      return;
+    }
 
-    setChores([...chores, newChore]);
-    setNewChoreTitle('');
-    setNewChoreDescription('');
-    setNewChoreAssignedTo('');
-    refRBSheet.current?.close();
+    try {
+      const dueDateTime = new Date(newChoreDate);
+      dueDateTime.setHours(newChoreDueTime.getHours());
+      dueDateTime.setMinutes(newChoreDueTime.getMinutes());
+
+      const backendChore = await createChore({
+        groupId: groupId,
+        title: newChoreTitle,
+        description: newChoreDescription || undefined,
+        dueDate: dueDateTime,
+        completed: false,
+      });
+
+      const convertedChore = convertBackendChore(backendChore);
+      setChores([...chores, convertedChore]);
+      setNewChoreTitle('');
+      setNewChoreDescription('');
+      refRBSheet.current?.close();
+    } catch (error) {
+      console.error('Error creating chore:', error);
+      Alert.alert('Error', 'Failed to create chore. Please try again.');
+    }
   };
 
-  const toggleChoreStatus = (choreId: string) => {
-    setChores(chores.map(chore => {
-      if (chore.id === choreId) {
-        const newStatus = chore.status === 'completed' ? 'pending' : 'completed';
-        return { ...chore, status: newStatus };
-      }
-      return chore;
-    }));
+  const handleToggleChoreStatus = async (choreId: number) => {
+    if (!groupId) {
+      Alert.alert('Error', 'No group selected.');
+      return;
+    }
+
+    try {
+      const backendChore = await toggleChoreCompleted(choreId, groupId);
+      const convertedChore = convertBackendChore(backendChore);
+      setChores(chores.map(chore => 
+        chore.choreId === choreId ? convertedChore : chore
+      ));
+    } catch (error) {
+      console.error('Error toggling chore status:', error);
+      Alert.alert('Error', 'Failed to update chore status. Please try again.');
+    }
   };
 
   const getChoresForDate = (date: Date) => {
@@ -196,13 +225,6 @@ export default function ChoreTrackerScreen() {
       return choreDate.getDate() === date.getDate() &&
              choreDate.getMonth() === date.getMonth() &&
              choreDate.getFullYear() === date.getFullYear();
-    }).map(chore => {
-      // Update status if overdue
-      const now = new Date();
-      if (chore.status !== 'completed' && new Date(chore.dueDate) < now) {
-        return { ...chore, status: 'overdue' as const };
-      }
-      return chore;
     });
   };
 
@@ -213,23 +235,25 @@ export default function ChoreTrackerScreen() {
     const choreDate = new Date(chore.dueDate);
     return choreDate >= weekStart && choreDate <= weekEnd;
   });
-  const completedCount = weekChores.filter(c => c.status === 'completed').length;
-  const overdueCount = weekChores.filter(c => c.status === 'overdue').length;
+  const completedCount = weekChores.filter(c => c.completed).length;
+  const overdueCount = weekChores.filter(c => {
+    const now = new Date();
+    return !c.completed && new Date(c.dueDate) < now;
+  }).length;
   const completionRate = weekChores.length > 0 ? Math.round((completedCount / weekChores.length) * 100) : 0;
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return '#4CAF50';
-      case 'overdue': return '#F44336';
-      default: return '#E0E0E0';
-    }
+  const getStatusColor = (chore: Chore) => {
+    if (chore.completed) return '#4CAF50';
+    const now = new Date();
+    if (new Date(chore.dueDate) < now) return '#F44336';
+    return '#E0E0E0';
   };
 
   const getStatusText = (chore: Chore) => {
+    if (chore.completed) return 'Completed';
     const now = new Date();
-    if (chore.status === 'completed') return 'Completed';
     const dueDateTime = new Date(chore.dueDate);
-    if (chore.status === 'overdue' || dueDateTime < now) return 'Overdue';
+    if (dueDateTime < now) return 'Overdue';
     return `Due ${chore.dueTime}`;
   };
 
@@ -240,6 +264,15 @@ export default function ChoreTrackerScreen() {
     if (lowerTitle.includes('bathroom') || lowerTitle.includes('toilet')) return '🚿';
     return '🧹';
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#7D60A3" />
+        <Text style={{ marginTop: 16, color: '#666' }}>Loading chores...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -295,31 +328,27 @@ export default function ChoreTrackerScreen() {
         {/* Today's Chores */}
         <Text style={styles.sectionTitle}>Today's Chores</Text>
         {todayChores.length === 0 ? (
-          <Text style={styles.emptyText}>No chores for today</Text>
+          <Text key="empty-chores" style={styles.emptyText}>No chores for today</Text>
         ) : (
           todayChores.map((chore) => (
             <TouchableOpacity
-              key={chore.id}
-              style={[styles.choreCard, { borderColor: getStatusColor(chore.status) }]}
-              onPress={() => toggleChoreStatus(chore.id)}
+              key={chore.choreId}
+              style={[styles.choreCard, { borderColor: getStatusColor(chore) }]}
+              onPress={() => handleToggleChoreStatus(chore.choreId)}
             >
               <View style={styles.choreLeft}>
                 <Text style={styles.choreIcon}>{getChoreIcon(chore.title)}</Text>
                 <View style={styles.choreInfo}>
                   <Text style={styles.choreTitle}>{chore.title}</Text>
                   <Text style={styles.choreDescription}>{chore.description}</Text>
-                  <View style={styles.choreAssignee}>
-                    <Text style={styles.personIcon}>👤</Text>
-                    <Text style={styles.assigneeText}>{chore.assignedTo}</Text>
-                  </View>
                 </View>
               </View>
               <View style={styles.choreRight}>
-                <Text style={[styles.statusText, { color: getStatusColor(chore.status) }]}>
+                <Text style={[styles.statusText, { color: getStatusColor(chore) }]}>
                   {getStatusText(chore)}
                 </Text>
-                <View style={[styles.statusCircle, { borderColor: getStatusColor(chore.status) }]}>
-                  {chore.status === 'completed' && (
+                <View style={[styles.statusCircle, { borderColor: getStatusColor(chore) }]}>
+                  {chore.completed && (
                     <Text style={styles.checkmark}>✓</Text>
                   )}
                 </View>
@@ -392,29 +421,6 @@ export default function ChoreTrackerScreen() {
             onChangeText={setNewChoreDescription}
             style={styles.input}
           />
-
-          <Text style={styles.inputLabel}>Assign To</Text>
-          <View style={styles.roommateSelector}>
-            {MOCK_ROOMMATES.map((roommate) => (
-              <TouchableOpacity
-                key={roommate}
-                style={[
-                  styles.roommateButton,
-                  newChoreAssignedTo === roommate && styles.roommateButtonSelected,
-                ]}
-                onPress={() => setNewChoreAssignedTo(roommate)}
-              >
-                <Text
-                  style={[
-                    styles.roommateButtonText,
-                    newChoreAssignedTo === roommate && styles.roommateButtonTextSelected,
-                  ]}
-                >
-                  {roommate}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
 
           <Text style={styles.inputLabel}>Due Date</Text>
           <TouchableOpacity

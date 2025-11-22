@@ -1,12 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../context/AuthContext';
+import { listGroupsForUser, listMembers } from '../services/groupsService';
 
 export default function RoommateDashboardScreen() {
   const navigation = useNavigation();
+  const auth = useContext(AuthContext);
+  const { user } = auth || {};
+  const [groupInfo, setGroupInfo] = useState<{ id: number; name: string } | null>(null);
+  const [memberCount, setMemberCount] = useState(0);
 
   const notImplemented = (label: string) => Alert.alert(label, 'Coming soon');
+
+  // Load group info
+  useEffect(() => {
+    const loadGroupInfo = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const groups = await listGroupsForUser(user.id);
+        if (groups.length > 0) {
+          const group = groups[0];
+          setGroupInfo(group);
+          
+          // Load member count
+          const members = await listMembers(group.id);
+          setMemberCount(members.length);
+        }
+      } catch (error) {
+        console.error('Error loading group info:', error);
+      }
+    };
+
+    loadGroupInfo();
+  }, [user?.id]);
 
   return (
     <View style={styles.container}>
@@ -17,13 +46,25 @@ export default function RoommateDashboardScreen() {
           <Ionicons name="person" size={20} color="#14141A" />
         </View>
         <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.userName}>nomi user</Text>
-          <Text style={styles.userSub}>Apartment 2106</Text>
+          <Text style={styles.userName}>
+            {user?.first || 'nomi'} {user?.last || 'user'}
+          </Text>
         </View>
         <TouchableOpacity style={styles.gearBtn} onPress={() => navigation.navigate('Settings' as never)}>
           <Ionicons name="settings-sharp" size={18} color="#14141A" />
         </TouchableOpacity>
       </View>
+
+      {/* Group Section */}
+      {groupInfo && (
+        <TouchableOpacity 
+          style={styles.groupSection}
+          onPress={() => navigation.navigate('ManageGroup' as never)}
+        >
+          <Text style={styles.groupName}>{groupInfo.name}</Text>
+          <Ionicons name="people" size={24} color="#14141A" />
+        </TouchableOpacity>
+      )}
 
       {/* Top stats */}
       <View style={styles.statHorizontalDividerTop} />
@@ -162,7 +203,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   userName: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '600',
     fontFamily: 'Inter',
     color: '#111',
@@ -385,6 +426,25 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  groupSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: QUICK_BG,
+    borderRadius: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: BORDER,
+  },
+  groupName: {
+    fontSize: 18,
+    fontWeight: '600',
+    fontFamily: 'Inter',
+    color: '#14141A',
+    flex: 1,
   },
 });
 

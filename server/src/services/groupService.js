@@ -9,22 +9,35 @@ export const GroupService = {
         return createdGroup;
     },
 
-    async searchUsersByUsername(query) {
+    async searchUsersByEmail(query) {
         const { rows } = await pool.query(
-            `SELECT id, username, email
+            `SELECT id, email
              FROM users
-             WHERE username ILIKE $1
-             ORDER BY username
+             WHERE email ILIKE $1
+             ORDER BY email
              LIMIT 20`,
             [`%${query}%`]
         );
         return rows;
     },
 
-    async addUserToGroupByUsername({ username, groupId, addedBy = null }) {
+    async addUserToGroupByEmail({ email, groupId, addedBy = null }) {
+        // First find user by email
+        const userResult = await pool.query(
+            'SELECT id FROM users WHERE email = $1',
+            [email]
+        );
+        
+        if (userResult.rows.length === 0) {
+            throw new Error(`User with email ${email} not found`);
+        }
+        
+        const userId = userResult.rows[0].id;
+        
+        // Add user to group
         const { rows } = await pool.query(
             'SELECT * FROM add_user_to_group($1, $2, $3)',
-            [username, Number(groupId), addedBy]
+            [userId, Number(groupId), addedBy]
         );
         return rows[0]; // { group_id, user_id }
     }

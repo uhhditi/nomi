@@ -6,10 +6,10 @@ const saltRounds = 10;
 //handles logic
 export const UserService = {
     async createUser(newUser) {
-        const { email, password, username, first, last } = newUser;
+        const { email, password, first, last } = newUser;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         console.log("hashed pass", hashedPassword)
-        const createdUser = await UserModel.create({ email, password:hashedPassword, username,first, last});
+        const createdUser = await UserModel.create({ email, password:hashedPassword, first, last});
 
         const accessToken = jwt.sign({ userId: createdUser.id }, process.env.JWT_SECRET, { expiresIn: "15m" });
         const refreshToken = jwt.sign({ userId: createdUser.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
