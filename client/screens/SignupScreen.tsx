@@ -15,6 +15,7 @@ export default function SignupScreen() {
         Home: undefined;
         Login: undefined;
         Signup: undefined;
+        JoinOrCreateGroup: undefined;
     };
       
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Signup'>>();
@@ -28,12 +29,14 @@ export default function SignupScreen() {
     const { register } = auth;
     async function handleSignup() {
         try {
-          const data = await register(name, email, password); 
-          console.log("register data", data); 
+          const data = await register(email, password, name, name); 
+          console.log("register data", data);
+          if (data) {
+            navigation.navigate("JoinOrCreateGroup" as never);
+          }
         } catch (err) {
           console.error(err);
         }
-        navigation.navigate("Login");
       }
   
     return (
