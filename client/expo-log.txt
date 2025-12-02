@@ -1,0 +1,12 @@
+env: load .env
+env: export IP_ADDRESS PORT
+Starting project at /Users/sophia/Desktop/nomi/client
+Starting Metro Bundler
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+The following packages should be updated for best compatibility with the installed expo version:
+  babel-preset-expo@11.0.15 - expected version: ~54.0.0
+  expo@54.0.22 - expected version: ~54.0.25
+  react-native-worklets@0.5.2 - expected version: 0.5.1
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:8081
+Logs for your project will appear below.

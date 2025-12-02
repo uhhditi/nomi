@@ -96,7 +96,7 @@ export async function listMembers(groupId: number) {
   const headers = await getAuthHeaders();
   const r = await fetch(`${API_URL}/groups/${groupId}/members`, { headers });
   if (!r.ok) throw new Error(`List failed: ${r.status}`);
-  return r.json() as Promise<Array<{id:number; email:string}>>;
+  return r.json() as Promise<Array<{id:number; email:string; first?:string; last?:string}>>;
 }
 
 export async function listGroupsForUser(userId: number) {

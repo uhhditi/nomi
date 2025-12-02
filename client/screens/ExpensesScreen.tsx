@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthContext } from '../context/AuthContext';
+import { listGroupsForUser } from '../services/groupsService';
+import { getExpensesByGroup, Expense, ExpenseShare } from '../services/expenseService';
 
 type RootStackParamList = {
   Expenses: undefined;
@@ -11,19 +14,113 @@ type RootStackParamList = {
   RoommateDashboard: undefined;
 };
 
+interface OwedItem {
+  expenseId: number;
+  shareId: number;
+  expenseName: string;
+  userName: string;
+  amount: number;
+}
+
+interface YouOweItem {
+  expenseId: number;
+  expenseName: string;
+  paidByName: string;
+  amount: number;
+}
+
 export default function ExpensesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Expenses'>>();
+  const auth = useContext(AuthContext);
+  const { user } = auth || {};
 
-  // Mock data - replace with actual data from API
-  const pendingPayments = [
-    { id: '1', from: 'rm 2', amount: 12.45, description: 'eggs' },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [owedItems, setOwedItems] = useState<OwedItem[]>([]);
+  const [youOweItems, setYouOweItems] = useState<YouOweItem[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
 
-  const recentTransactions = [
-    { id: '1', type: 'received', from: 'rm 1', amount: 45, description: 'groceries', time: '20 min ago' },
-    { id: '2', type: 'other', from: 'rm 4', to: 'rm 3', amount: 12, description: 'coffee', time: '5 hours ago' },
-    { id: '3', type: 'paid', to: 'rm 2', amount: 19, description: 'tickets', time: '2 days ago' },
-  ];
+  useEffect(() => {
+    const loadExpenses = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Get user's groups
+        const groups = await listGroupsForUser(user.id);
+        if (groups.length === 0) {
+          setLoading(false);
+          return;
+        }
+
+        const groupId = groups[0].id;
+        const expenses = await getExpensesByGroup(groupId);
+
+        // Process expenses to get "Owed" and "You owe" items
+        const owed: OwedItem[] = [];
+        const youOwe: YouOweItem[] = [];
+
+        expenses.forEach((expense: Expense) => {
+          // "Owed" - expenses where current user paid, get shares (each share is a separate item)
+          if (expense.paid_by_user_id === user.id && expense.shares) {
+            expense.shares.forEach((share: ExpenseShare) => {
+              const userName = share.first && share.last 
+                ? `${share.first} ${share.last}` 
+                : share.email?.split('@')[0] || 'Unknown';
+              
+              // Each share is a separate item in the list
+              // Ensure amount is a number
+              const amount = typeof share.owed_amount === 'string' 
+                ? parseFloat(share.owed_amount) 
+                : (share.owed_amount || 0);
+              
+              owed.push({
+                expenseId: expense.expense_id,
+                shareId: share.share_id,
+                expenseName: expense.name,
+                userName,
+                amount,
+              });
+            });
+          }
+
+          // "You owe" - shares where current user is the one who owes
+          if (expense.shares) {
+            expense.shares.forEach((share: ExpenseShare) => {
+              if (share.user_id === user.id) {
+                const paidByName = expense.first && expense.last
+                  ? `${expense.first} ${expense.last}`
+                  : expense.email?.split('@')[0] || 'Unknown';
+                
+                // Ensure amount is a number
+                const amount = typeof share.owed_amount === 'string' 
+                  ? parseFloat(share.owed_amount) 
+                  : (share.owed_amount || 0);
+                
+                youOwe.push({
+                  expenseId: expense.expense_id,
+                  expenseName: expense.name,
+                  paidByName,
+                  amount,
+                });
+              }
+            });
+          }
+        });
+
+        setOwedItems(owed);
+        setYouOweItems(youOwe);
+        setRecentTransactions(expenses.slice(0, 5)); // Show last 5 expenses as recent transactions
+      } catch (error) {
+        console.error('Error loading expenses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadExpenses();
+  }, [user?.id]);
 
   return (
     <View style={styles.container}>
@@ -58,14 +155,37 @@ export default function ExpensesScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Pending Section */}
-        <Text style={styles.sectionTitle}>Pending</Text>
-        {pendingPayments.length > 0 ? (
-          pendingPayments.map((payment) => (
-            <View key={payment.id} style={styles.pendingCard}>
+        {/* Owed Section - Each expense share item where current user is owed */}
+        <Text style={styles.sectionTitle}>Owed</Text>
+        {loading ? (
+          <ActivityIndicator size="small" color="#7D60A3" />
+        ) : owedItems.length > 0 ? (
+          owedItems.map((item) => (
+            <View key={`owed-${item.shareId}`} style={styles.pendingCard}>
               <View style={styles.pendingContent}>
                 <Text style={styles.pendingText}>
-                  you owe {payment.from} ${payment.amount.toFixed(2)} for {payment.description}
+                  {item.userName} owes you ${item.amount.toFixed(2)} for {item.expenseName}
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.deleteButton}>
+                <MaterialCommunityIcons name="delete" size={18} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.emptyText}>No one owes you</Text>
+        )}
+
+        {/* You Owe Section - What the current user owes */}
+        <Text style={styles.sectionTitle}>You owe:</Text>
+        {loading ? (
+          <ActivityIndicator size="small" color="#7D60A3" />
+        ) : youOweItems.length > 0 ? (
+          youOweItems.map((item, index) => (
+            <View key={`youowe-${item.expenseId}-${index}`} style={styles.pendingCard}>
+              <View style={styles.pendingContent}>
+                <Text style={styles.pendingText}>
+                  you owe {item.paidByName} ${item.amount.toFixed(2)} for {item.expenseName}
                 </Text>
                 <TouchableOpacity style={styles.payNowButton}>
                   <Text style={styles.payNowText}>Pay Now</Text>
@@ -76,28 +196,44 @@ export default function ExpensesScreen() {
               </TouchableOpacity>
             </View>
           ))
-        ) : null}
-        {pendingPayments.length === 0 && (
-          <Text style={styles.emptyText}>No more pending payments</Text>
+        ) : (
+          <Text style={styles.emptyText}>You don't owe anyone</Text>
         )}
 
         {/* Recent Transactions Section */}
         <Text style={styles.sectionTitle}>Recent Transactions</Text>
-        {recentTransactions.map((transaction) => (
-          <View key={transaction.id} style={styles.transactionCard}>
-            <View style={styles.transactionIcon}>
-              <Text style={styles.transactionDollarSign}>$</Text>
-            </View>
-            <View style={styles.transactionContent}>
-              <Text style={styles.transactionText}>
-                {transaction.type === 'received' && `${transaction.from} paid you $${transaction.amount} for ${transaction.description}`}
-                {transaction.type === 'paid' && `you paid ${transaction.to} $${transaction.amount} for ${transaction.description}!`}
-                {transaction.type === 'other' && `${transaction.from} paid ${transaction.to} $${transaction.amount} for ${transaction.description}`}
-              </Text>
-              <Text style={styles.transactionTime}>{transaction.time}</Text>
-            </View>
-          </View>
-        ))}
+        {loading ? (
+          <ActivityIndicator size="small" color="#7D60A3" />
+        ) : recentTransactions.length > 0 ? (
+          recentTransactions.map((expense: Expense) => {
+            const paidByName = expense.first && expense.last
+              ? `${expense.first} ${expense.last}`
+              : expense.email?.split('@')[0] || 'Unknown';
+            
+            // Ensure price is a number
+            const price = typeof expense.price === 'string' 
+              ? parseFloat(expense.price) 
+              : (expense.price || 0);
+            
+            return (
+              <View key={expense.expense_id} style={styles.transactionCard}>
+                <View style={styles.transactionIcon}>
+                  <Text style={styles.transactionDollarSign}>$</Text>
+                </View>
+                <View style={styles.transactionContent}>
+                  <Text style={styles.transactionText}>
+                    {paidByName} paid ${price.toFixed(2)} for {expense.name}
+                  </Text>
+                  <Text style={styles.transactionTime}>
+                    {new Date(expense.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+              </View>
+            );
+          })
+        ) : (
+          <Text style={styles.emptyText}>No recent transactions</Text>
+        )}
       </ScrollView>
 
       {/* Bottom Navigation */}
@@ -172,6 +308,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     color: '#14141A',
     marginTop: 20,
+    marginBottom: 12,
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    fontFamily: 'Inter',
+    color: '#14141A',
     marginBottom: 12,
   },
   addPurchaseRow: {

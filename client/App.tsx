@@ -46,7 +46,7 @@ type RootStackParamList = {
   ManageGroup: undefined;
   Expenses: undefined;
   ReceiptScanner: undefined;
-  ReceiptReview: { items: Array<{ name: string; quantity: number; price: number }> };
+  ReceiptReview: { items: Array<{ name: string; quantity?: number; price: number }>; date?: string | null };
   ManualEntry: undefined;
 };
 

@@ -1,35 +1,136 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthContext } from '../context/AuthContext';
+import { listGroupsForUser, listMembers } from '../services/groupsService';
+import { createExpense } from '../services/expenseService';
 
 type RootStackParamList = {
   Expenses: undefined;
   ManualEntry: undefined;
+  ReceiptReview: { items: Array<{ name: string; quantity: number; price: number }>; date?: string | null };
 };
+
+interface Roommate {
+  id: number;
+  email: string;
+  first?: string;
+  last?: string;
+}
 
 export default function ManualEntryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'ManualEntry'>>();
+  const auth = useContext(AuthContext);
+  const { user } = auth || {};
 
   const [itemName, setItemName] = useState('');
-  const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
+  const [roommates, setRoommates] = useState<Roommate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [selectedRoommates, setSelectedRoommates] = useState<number[]>([]);
+  const [groupId, setGroupId] = useState<number | null>(null);
 
-  // Mock roommates - replace with actual data from API
-  const roommates = ['rm 1', 'rm 2', 'rm 3', 'rm 4', 'rm 5'];
-  const [selectedRoommates, setSelectedRoommates] = useState<string[]>(roommates);
+  // Load roommates from database
+  useEffect(() => {
+    const loadRoommates = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
 
-  const toggleRoommate = (roommate: string) => {
+      try {
+        // Get user's groups
+        const groups = await listGroupsForUser(user.id);
+        if (groups.length === 0) {
+          setLoading(false);
+          return;
+        }
+
+        // Get members from the first group (users can only be in one group)
+        const group = groups[0];
+        setGroupId(group.id);
+        const members = await listMembers(group.id);
+        
+        // Include all members including the current user (they can buy items for themselves)
+        setRoommates(members);
+      } catch (error) {
+        console.error('Error loading roommates:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRoommates();
+  }, [user?.id]);
+
+  const toggleRoommate = (roommateId: number) => {
     setSelectedRoommates((prev) =>
-      prev.includes(roommate) ? prev.filter((r) => r !== roommate) : [...prev, roommate]
+      prev.includes(roommateId) ? prev.filter((id) => id !== roommateId) : [...prev, roommateId]
     );
   };
 
-  const handleContinue = () => {
-    // TODO: Save expense data to API
-    if (itemName && quantity && price) {
-      navigation.navigate('Expenses');
+  const getRoommateDisplayName = (roommate: Roommate): string => {
+    if (roommate.id === user?.id) {
+      return 'you';
+    }
+    if (roommate.first && roommate.last) {
+      return `${roommate.first} ${roommate.last}`;
+    }
+    // Fallback to email if name not available
+    return roommate.email.split('@')[0]; // Use part before @ as display name
+  };
+
+  const handleContinue = async () => {
+    if (!itemName || !price) {
+      Alert.alert('Missing Information', 'Please fill in item name and price');
+      return;
+    }
+
+    if (!groupId || !user?.id) {
+      Alert.alert('Error', 'You must be in a group to add expenses');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const priceValue = parseFloat(price);
+      
+      // Calculate owed amount per person
+      // Divide price by the number of selected people (including yourself if selected)
+      // Round to 2 decimal places since it's money
+      const totalPeople = selectedRoommates.length > 0 ? selectedRoommates.length : 1;
+      const owedAmount = Math.round((priceValue / totalPeople) * 100) / 100;
+      
+      // Create shares only for selected people who are NOT the current user (the payer)
+      // The current user doesn't owe themselves, so no share is created for them
+      const shares = selectedRoommates
+        .filter(userId => userId !== user.id) // Exclude the payer - they don't owe themselves
+        .map(userId => ({
+          userId,
+          owedAmount,
+        }));
+
+      await createExpense({
+        groupId,
+        name: itemName,
+        price: priceValue,
+        shares,
+      });
+
+      Alert.alert('Success', 'Expense added successfully', [
+        {
+          text: 'OK',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } catch (error) {
+      console.error('Error saving expense:', error);
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to save expense');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -64,18 +165,6 @@ export default function ManualEntryScreen() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="enter quantity:"
-            placeholderTextColor="#8E8E93"
-            value={quantity}
-            onChangeText={setQuantity}
-            keyboardType="numeric"
-          />
-          <View style={styles.inputUnderline} />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
             placeholder="enter price:"
             placeholderTextColor="#8E8E93"
             value={price}
@@ -88,29 +177,43 @@ export default function ManualEntryScreen() {
         {/* Select Roommates Section */}
         <Text style={styles.sectionTitle}>select roommates:</Text>
         <View style={styles.roommateRow}>
-          {roommates.map((roommate) => (
-            <TouchableOpacity
-              key={roommate}
-              style={[
-                styles.checkbox,
-                selectedRoommates.includes(roommate) && styles.checkboxChecked,
-              ]}
-              onPress={() => toggleRoommate(roommate)}
-            >
-              <Text
+          {loading ? (
+            <ActivityIndicator size="small" color="#7D60A3" />
+          ) : roommates.length === 0 ? (
+            <Text style={styles.noRoommatesText}>No roommates found</Text>
+          ) : (
+            roommates.map((roommate) => (
+              <TouchableOpacity
+                key={roommate.id}
                 style={[
-                  styles.checkboxText,
-                  selectedRoommates.includes(roommate) && styles.checkboxTextChecked,
+                  styles.checkbox,
+                  selectedRoommates.includes(roommate.id) && styles.checkboxChecked,
                 ]}
+                onPress={() => toggleRoommate(roommate.id)}
               >
-                {roommate}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.checkboxText,
+                    selectedRoommates.includes(roommate.id) && styles.checkboxTextChecked,
+                  ]}
+                >
+                  {getRoommateDisplayName(roommate)}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
 
-        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+        <TouchableOpacity 
+          style={[styles.continueButton, saving && styles.continueButtonDisabled]} 
+          onPress={handleContinue}
+          disabled={saving}
+        >
+          {saving ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text style={styles.continueButtonText}>Continue</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -232,6 +335,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     fontFamily: 'Inter',
+  },
+  continueButtonDisabled: {
+    opacity: 0.6,
+  },
+  noRoommatesText: {
+    fontSize: 12,
+    fontFamily: 'Inter',
+    fontWeight: '500',
+    color: '#6B7280',
+    fontStyle: 'italic',
   },
 });
 

@@ -82,7 +82,7 @@ export default function RoommateDashboardScreen() {
       <View style={styles.statHorizontalDivider} />
       {/* Quick actions - 2 x 2 grid */}
       <View style={styles.quickGrid}>
-        <TouchableOpacity style={styles.quickCard} onPress={() => notImplemented('Add Expense')}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('ReceiptScanner' as never)}>
           <View style={styles.quickIcon}>
             <Ionicons name="add" size={20} color="#14141A" />
           </View>

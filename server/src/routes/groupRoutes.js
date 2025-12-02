@@ -183,7 +183,7 @@ router.get('/:groupId/members', async (req, res) => {
   try {
     // Get users that are members of this group
     const { rows } = await pool.query(
-      `SELECT u.id, u.email
+      `SELECT u.id, u.email, u.first, u.last
        FROM users u
        JOIN groups g ON u.id = ANY(g.user_ids)
        WHERE g.id = $1
