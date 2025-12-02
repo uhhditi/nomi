@@ -11,6 +11,7 @@ type RootStackParamList = {
   Start: undefined;
   NomiStart: undefined;
   GroupWorkflow: undefined;
+  ReceiptScanner: undefined;
 };
 
 export default function NomiStartScreen() {
@@ -90,6 +91,15 @@ export default function NomiStartScreen() {
         {/* Logo */}
         <Text style={styles.brand}>nomi</Text>
         <Text style={styles.subtitle}>Simplified Shared Living</Text>
+
+        {/* Add Expense Button */}
+        <TouchableOpacity 
+          style={styles.expenseButton} 
+          onPress={() => navigation.navigate('ReceiptScanner' as never)}
+        >
+          <Ionicons name="receipt-outline" size={20} color="#FFFFFF" />
+          <Text style={styles.expenseButtonText}>Add Expense</Text>
+        </TouchableOpacity>
 
         {/* Toggle */}
         <View style={styles.toggleWrap}>
@@ -457,6 +467,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontWeight: '500',
     color: '#6B7280',
+  },
+  expenseButton: {
+    backgroundColor: CARD_BG,
+    borderRadius: 12,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  expenseButtonText: {
+    fontFamily: 'Inter',
+    fontWeight: '600',
+    fontSize: 16,
+    color: '#14141A',
   },
 });
 

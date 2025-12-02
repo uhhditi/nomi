@@ -12,6 +12,8 @@ export const getStoredToken = async () => {
   }
 };
 
+export const getToken = getStoredToken; // Alias for convenience
+
 export const storeToken = async (token: string) => {
   try {
     await SecureStore.setItemAsync('accessToken', token);
