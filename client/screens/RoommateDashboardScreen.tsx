@@ -4,6 +4,7 @@ import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
 import { listGroupsForUser, listMembers } from '../services/groupsService';
+import { getChores, Chore } from '../services/choreService';
 
 export default function RoommateDashboardScreen() {
   const navigation = useNavigation();
@@ -11,10 +12,43 @@ export default function RoommateDashboardScreen() {
   const { user } = auth || {};
   const [groupInfo, setGroupInfo] = useState<{ id: number; name: string } | null>(null);
   const [memberCount, setMemberCount] = useState(0);
+  const [recentChore, setRecentChore] = useState<Chore | null>(null);
+  const [choresToDoCount, setChoresToDoCount] = useState(0);
 
   const notImplemented = (label: string) => Alert.alert(label, 'Coming soon');
 
-  // Load group info
+  // Format relative time (e.g., "2 hours ago", "3 days ago")
+  const formatRelativeTime = (dateString: string | Date | undefined): string => {
+    if (!dateString) return 'Unknown time';
+    
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    const diffWeeks = Math.floor(diffDays / 7);
+    const diffMonths = Math.floor(diffDays / 30);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`;
+    if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+    if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+    if (diffWeeks < 4) return `${diffWeeks} ${diffWeeks === 1 ? 'week' : 'weeks'} ago`;
+    if (diffMonths < 12) return `${diffMonths} ${diffMonths === 1 ? 'month' : 'months'} ago`;
+    return `${Math.floor(diffDays / 365)} ${Math.floor(diffDays / 365) === 1 ? 'year' : 'years'} ago`;
+  };
+
+  // Format due date (e.g., "Jan 15, 2024")
+  const formatDueDate = (dateString: string | Date | undefined): string => {
+    if (!dateString) return 'No due date';
+    
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  };
+
+  // Load group info and recent chores
   useEffect(() => {
     const loadGroupInfo = async () => {
       if (!user?.id) return;
@@ -28,6 +62,25 @@ export default function RoommateDashboardScreen() {
           // Load member count
           const members = await listMembers(group.id);
           setMemberCount(members.length);
+
+          // Load most recent chore and count incomplete chores
+          try {
+            const chores = await getChores(group.id);
+            // Sort by created_at DESC and take the most recent one
+            const sortedChores = chores
+              .sort((a, b) => {
+                const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return dateB - dateA;
+              });
+            setRecentChore(sortedChores.length > 0 ? sortedChores[0] : null);
+            
+            // Count incomplete chores (where completed = false)
+            const incompleteChores = chores.filter(chore => !chore.completed);
+            setChoresToDoCount(incompleteChores.length);
+          } catch (error) {
+            console.error('Error loading recent chore:', error);
+          }
         }
       } catch (error) {
         console.error('Error loading group info:', error);
@@ -75,7 +128,7 @@ export default function RoommateDashboardScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>3</Text>
+          <Text style={styles.statValue}>{choresToDoCount}</Text>
           <Text style={styles.statLabel}>Chores To-Do</Text>
         </View>
       </View>
@@ -124,28 +177,35 @@ export default function RoommateDashboardScreen() {
 
       {/* Recent Activity */}
       <Text style={styles.sectionTitle}>Recent Activity</Text>
-      <View style={styles.activityCard}>
-        <View style={styles.activityRow}>
-          <View style={styles.activityIcon}>
-            <MaterialCommunityIcons name="currency-usd" size={18} color="#14141A" />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.activityText}>roommate 1 paid $45 for groceries</Text>
-            <Text style={styles.activitySub}>2 hours ago</Text>
-          </View>
-        </View>
-      </View>
-      <View style={styles.activityCard}>
-        <View style={styles.activityRow}>
-          <View style={styles.activityIcon}>
-            <Ionicons name="checkmark-done" size={18} color="#14141A" />
-          </View>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.activityText}>roommate 2 added dishes to chores</Text>
-            <Text style={styles.activitySub}>5 hours ago</Text>
+      {recentChore ? (
+        <View style={styles.activityCard}>
+          <View style={styles.activityRow}>
+            <View style={styles.activityIcon}>
+              <Ionicons name="checkmark-done" size={18} color="#14141A" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.activityText}>
+                {recentChore.title} by {formatDueDate(recentChore.dueDate)}
+              </Text>
+              <Text style={styles.activitySub}>
+                {formatRelativeTime(recentChore.createdAt)}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
+      ) : (
+        <View style={styles.activityCard}>
+          <View style={styles.activityRow}>
+            <View style={styles.activityIcon}>
+              <Ionicons name="checkmark-done" size={18} color="#14141A" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.activityText}>No recent chores</Text>
+              <Text style={styles.activitySub}>Create a chore to see activity</Text>
+            </View>
+          </View>
+        </View>
+      )}
 
       </ScrollView>
 

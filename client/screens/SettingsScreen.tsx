@@ -119,7 +119,11 @@ export default function SettingsScreen() {
           <View style={styles.profileCard}>
             <View style={styles.profileRow}>
               <Text style={styles.label}>Name</Text>
-              <Text style={styles.value}>{user?.name || 'Not set'}</Text>
+              <Text style={styles.value}>
+                {user?.first && user?.last 
+                  ? `${user.first} ${user.last}` 
+                  : user?.first || user?.last || 'Not set'}
+              </Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.profileRow}>
