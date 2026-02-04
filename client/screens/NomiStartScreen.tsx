@@ -141,35 +141,9 @@ export default function NomiStartScreen() {
               <Ionicons name="eye-off-outline" size={18} color="#14141A" />
             </View>
 
-            {/* Row: remember + forgot */}
-            <View style={styles.inlineRow}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View style={styles.checkbox} />
-                <Text style={styles.inlineText}>Remember me</Text>
-              </View>
-              <TouchableOpacity>
-                <Text style={styles.link}>Forgot Password?</Text>
-              </TouchableOpacity>
-            </View>
-
             <TouchableOpacity style={styles.primaryBtn} onPress={handleSignIn}>
               <Text style={styles.primaryBtnText}>Sign In</Text>
             </TouchableOpacity>
-
-            <View style={styles.orRow}>
-              <View style={styles.hr} />
-              <Text style={styles.orText}>or continue with</Text>
-              <View style={styles.hr} />
-            </View>
-
-            <View style={styles.oauthBtn}>
-              <Ionicons name="logo-google" size={18} color="#DB4437" />
-              <Text style={styles.oauthText}>Continue with Google</Text>
-            </View>
-            <View style={styles.oauthBtn}>
-              <Ionicons name="logo-apple" size={18} color="#14141A" />
-              <Text style={styles.oauthText}>Continue with Apple</Text>
-            </View>
           </>
         ) : (
           <>
@@ -260,21 +234,6 @@ export default function NomiStartScreen() {
             <TouchableOpacity style={styles.primaryBtn} onPress={handleSignUp}>
               <Text style={styles.primaryBtnText}>Sign Up</Text>
             </TouchableOpacity>
-
-            <View style={styles.orRow}>
-              <View style={styles.hr} />
-              <Text style={styles.orText}>or continue with</Text>
-              <View style={styles.hr} />
-            </View>
-
-            <View style={styles.oauthBtn}>
-              <Ionicons name="logo-google" size={18} color="#DB4437" />
-              <Text style={styles.oauthText}>Continue with Google</Text>
-            </View>
-            <View style={styles.oauthBtn}>
-              <Ionicons name="logo-apple" size={18} color="#14141A" />
-              <Text style={styles.oauthText}>Continue with Apple</Text>
-            </View>
           </>
         )}
       </ScrollView>
