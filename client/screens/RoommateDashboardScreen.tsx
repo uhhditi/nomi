@@ -213,11 +213,8 @@ export default function RoommateDashboardScreen() {
           <Text style={styles.aiTitle}>AI Suggestions</Text>
         </View>
         <Text style={styles.aiText}>
-          Based on your fridge, you can make pesto pasta today with roommate 1!
+          Coming soon
         </Text>
-        <TouchableOpacity style={styles.aiButton} onPress={() => notImplemented('View recipe')}>
-          <Text style={styles.aiButtonText}>view recipe</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Recent Activity */}
