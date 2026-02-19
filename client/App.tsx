@@ -11,7 +11,7 @@ import SymptomScreen from './screens/SymptomScreen';
 import { AuthProvider } from './context/AuthContext';
 import DashboardScreen from './screens/DashboardScreen';
 import RoommateDashboardScreen from './screens/RoommateDashboardScreen';
-import FridgeScreen from './screens/FridgeScreen';
+import GroceryListScreen from './screens/GroceryListScreen';
 import CreateGroupScreen from './screens/CreateGroupScreen';
 import ChoreTrackerScreen from './screens/ChoreTrackerScreen';
 import RulesScreen from './screens/RulesScreen';
@@ -103,7 +103,7 @@ export default function App() {
         options={{ headerShown: false }} />
         <Stack.Screen name="RoommateDashboard" component={RoommateDashboardScreen}
         options={{ headerShown: false }} />
-        <Stack.Screen name="Fridge" component={FridgeScreen}
+        <Stack.Screen name="Fridge" component={GroceryListScreen}
         options={{ headerShown: false }} />
         <Stack.Screen name="NomiStart" component={NomiStartScreen}
         options={{ headerShown: false }} />
