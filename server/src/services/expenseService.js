@@ -46,11 +46,12 @@ export const ExpenseService = {
 
   async getExpensesByGroup(groupId) {
     if (!groupId) {
-      throw new Error('groupId is required');
+      // Instead of throwing, return empty array for users with no group
+      console.warn('No groupId provided to getExpensesByGroup. Returning empty expenses list.');
+      return [];
     }
 
     const expenses = await ExpenseModel.getByGroupId(groupId);
-    
     // Fetch shares for each expense
     const expensesWithShares = await Promise.all(
       expenses.map(async (expense) => {
@@ -87,6 +88,13 @@ export const ExpenseService = {
     }
 
     return await ExpenseModel.delete(expenseId);
+  },
+
+  async markSharesPaid(shareIds) {
+    if (!shareIds || shareIds.length === 0) {
+      throw new Error('shareIds are required');
+    }
+    return await ExpenseShareModel.markBulkPaid(shareIds);
   },
 };
 

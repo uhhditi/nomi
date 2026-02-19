@@ -33,6 +33,19 @@ export const UserController = {
         }
     },
 
+    async updateProfile(req, res) {
+        try {
+            const userId = req.user?.userId;
+            if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+            const { first, last, email } = req.body;
+            const updatedUser = await UserService.updateUser(userId, { first, last, email });
+            res.json(updatedUser);
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            res.status(500).json({ error: error.message || 'Failed to update profile' });
+        }
+    },
+
     //refresh token function
     async refreshToken(req, res){
         const { refreshToken } = req.body;

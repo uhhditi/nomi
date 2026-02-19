@@ -16,6 +16,9 @@ router.get('/group/:groupId', ExpenseController.getExpensesByGroup);
 // Get expenses by user
 router.get('/user', ExpenseController.getExpensesByUser);
 
+// Mark shares as paid (must come before /:expenseId to avoid route conflict)
+router.put('/shares/paid', ExpenseController.markSharesPaid);
+
 // Update expense
 router.put('/:expenseId', ExpenseController.updateExpense);
 

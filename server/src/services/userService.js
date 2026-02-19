@@ -35,7 +35,11 @@ export const UserService = {
             console.log("refresh token: " + refreshToken);
             return { accessToken: accessToken, refreshToken: refreshToken, user: user };
         }
-    }
+    },
+
+    async updateUser(userId, { first, last, email }) {
+        return await UserModel.update(userId, { first, last, email });
+    },
 }
 
 export const refreshToken = (refreshToken) => {
