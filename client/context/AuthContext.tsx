@@ -53,23 +53,28 @@ export const AuthProvider = ({ children }: any) => {
         });
 
         console.log("Response status:", response.status);
-        const data = await response.json();
-       // const text = await response.text();
-       // console.log("Response text:", text);
+        const text = await response.text();
+        let data: { user?: any; accessToken?: string; refreshToken?: string; message?: string; errorCode?: string } = {};
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch {
+          console.error('Signup response not JSON:', text?.slice(0, 200));
+          throw new Error(response.ok ? 'Invalid response from server' : 'Signup failed. Try again.');
+        }
 
-          if (!response.ok) {
-            if (data.errorCode === "23505") {
-              alert("This email has an account associated with it. Please log in.");
-              return null;
-            }
-            console.error('Signup failed:', data);
-            throw new Error(data.message || 'Signup failed');
+        if (!response.ok) {
+          if (data.errorCode === "23505") {
+            alert("This email has an account associated with it. Please log in.");
+            return null;
           }
-          console.log("yay")
-          setUser(data.user);
-          await storeToken(data.accessToken);
-          await storeRefreshToken(data.refreshToken);
-          return data.user;
+          console.error('Signup failed:', data);
+          throw new Error(data.message || 'Signup failed');
+        }
+        console.log("yay");
+        setUser(data.user);
+        await storeToken(data.accessToken);
+        await storeRefreshToken(data.refreshToken);
+        return data.user;
 
     } catch (error) {
       console.error('Registration error:', error);
