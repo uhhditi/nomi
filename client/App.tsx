@@ -34,7 +34,7 @@ type RootStackParamList = {
   Dashboard: undefined;
   Symptom: undefined;
   RoommateDashboard: undefined;
-  Fridge: undefined;
+  GroceryList: undefined;
   CreateGroup: undefined;
   ChoreTracker: undefined;
   Rules: undefined;
@@ -103,7 +103,7 @@ export default function App() {
         options={{ headerShown: false }} />
         <Stack.Screen name="RoommateDashboard" component={RoommateDashboardScreen}
         options={{ headerShown: false }} />
-        <Stack.Screen name="Fridge" component={GroceryListScreen}
+        <Stack.Screen name="GroceryList" component={GroceryListScreen}
         options={{ headerShown: false }} />
         <Stack.Screen name="NomiStart" component={NomiStartScreen}
         options={{ headerShown: false }} />

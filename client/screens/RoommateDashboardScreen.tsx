@@ -200,11 +200,11 @@ export default function RoommateDashboardScreen() {
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Add Expense</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Fridge' as never)}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('GroceryList' as never)}>
           <View style={styles.quickIcon}>
-            <MaterialCommunityIcons name="fridge" size={20} color="#14141A" />
+            <MaterialCommunityIcons name="cart-outline" size={20} color="#14141A" />
           </View>
-          <Text style={styles.quickLabel} numberOfLines={1}>Fridge</Text>
+          <Text style={styles.quickLabel} numberOfLines={1}>Grocery List</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('ChoreTracker' as never)}>
           <View style={styles.quickIcon}>
@@ -217,20 +217,6 @@ export default function RoommateDashboardScreen() {
             <Feather name="list" size={20} color="#14141A" />
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Rules</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* AI Suggestions */}
-      <View style={styles.aiCard}>
-        <View style={styles.aiHeaderRow}>
-          <MaterialCommunityIcons name="robot" size={18} color="#14141A" style={{ marginRight: 6 }} />
-          <Text style={styles.aiTitle}>AI Suggestions</Text>
-        </View>
-        <Text style={styles.aiText}>
-          Based on your fridge, you can make pesto pasta today with roommate 1!
-        </Text>
-        <TouchableOpacity style={styles.aiButton} onPress={() => notImplemented('View recipe')}>
-          <Text style={styles.aiButtonText}>view recipe</Text>
         </TouchableOpacity>
       </View>
 
