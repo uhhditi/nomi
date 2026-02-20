@@ -14,11 +14,11 @@ try {
       credentials: credentials,
     });
   } else {
-    client = new vision.ImageAnnotatorClient();
+    client = null; // No credentials – receipt scanning will return a clear error
   }
 } catch (error) {
   console.error('Error initializing Google Cloud Vision client:', error);
-  throw error;
+  client = null;
 }
 
 /**
@@ -96,6 +96,9 @@ function groupWordsIntoLines(pages) {
  * Extract text with proper line structure using document text detection
  */
 export async function extractTextFromImage(imageBuffer) {
+  if (!client) {
+    throw new Error('Receipt scanning is not configured. Set GOOGLE_APPLICATION_CREDENTIALS (local) or GOOGLE_CLOUD_CREDENTIALS (Vercel) with a Google Cloud Vision service account.');
+  }
   try {
     // Use documentTextDetection instead of textDetection
     // This provides better structure with blocks, paragraphs, and words
