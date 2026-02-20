@@ -30,4 +30,13 @@ app.use("/chores", verifyToken, choreRoutes);
 app.use("/receipts", receiptRoutes);
 app.use("/expenses", expenseRoutes);
 
+// Catch-all error handler so Vercel returns JSON instead of "A server error has occurred"
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  res.status(500).json({
+    message: process.env.NODE_ENV === "production" ? "internal server error" : (err?.message || "internal server error"),
+    errorCode: err?.code,
+  });
+});
+
 export default app;
