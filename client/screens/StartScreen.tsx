@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { IP_ADDRESS, PORT } from "@env";
+import { API_BASE_URL } from "../utils/apiConfig";
 
 type RootStackParamList = {
   Login: undefined;
@@ -28,9 +28,9 @@ export default function StartScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, "Start">>();
 
   useEffect(() => {
-    console.log("Loaded IP_ADDRESS:", IP_ADDRESS);
+    console.log("Loaded API_BASE_URL:", API_BASE_URL);
 
-    const url = `http://${IP_ADDRESS}:${PORT}/user/`;
+    const url = `${API_BASE_URL}/user/`;
     console.log("Testing URL:", url);
 
     fetch(url)

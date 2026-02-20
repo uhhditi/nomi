@@ -14,6 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.aditia.nomi",
       "config": {
         "usesNonExemptEncryption": false
       }
@@ -31,6 +32,11 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "61249191-81ee-47bf-ae34-9fb1465fbfe4"
+      }
+    }
   }
 }

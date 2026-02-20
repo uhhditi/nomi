@@ -1,7 +1,7 @@
-import { IP_ADDRESS, PORT } from '@env';
+import { API_BASE_URL } from '../utils/apiConfig';
 import { getToken } from './authService';
 
-const API_URL = `http://${IP_ADDRESS}:${PORT}/receipts`;
+const API_URL = `${API_BASE_URL}/receipts`;
 
 export interface ReceiptItem {
   name: string;

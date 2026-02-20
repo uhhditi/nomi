@@ -10,7 +10,8 @@ export const UserController = {
             
         } catch (error) {
             console.error("user creation error:", error);
-            res.status(500).send({message: "internal server error", errorCode: error.code});
+            const message = process.env.NODE_ENV === "production" ? "internal server error" : (error.message || "internal server error");
+            res.status(500).json({ message, errorCode: error.code });
         }
     },
 

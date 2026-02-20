@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
-import { IP_ADDRESS, PORT } from '@env';
+import { API_BASE_URL } from '../utils/apiConfig';
 
-const API_URL = `http://${IP_ADDRESS}:${PORT}/`;
+const API_URL = `${API_BASE_URL}/`;
 
 export const getStoredToken = async () => {
   try {
