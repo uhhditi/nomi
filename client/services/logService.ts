@@ -1,4 +1,4 @@
-import { IP_ADDRESS, PORT } from '@env'
+import { API_BASE_URL } from '../utils/apiConfig';
 import * as SecureStore from 'expo-secure-store';
 
 export async function getLogs() {
@@ -6,7 +6,7 @@ export async function getLogs() {
       // Get the access token 
       let accessToken = await SecureStore.getItemAsync('accessToken');
       
-      const response = await fetch(`http://${IP_ADDRESS}:${PORT}/logs/`, {
+      const response = await fetch(`${API_BASE_URL}/logs/`, {
           method: 'GET',
           headers: { 
               'Content-Type': 'application/json', 
@@ -35,7 +35,7 @@ export async function addLog(description: string, notes: string, date: Date, tim
 
     try {
       let accessToken = await SecureStore.getItemAsync('accessToken');
-      const response = await fetch(`http://${IP_ADDRESS}:${PORT}/logs/create`, {
+      const response = await fetch(`${API_BASE_URL}/logs/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
         body: JSON.stringify({description, notes, date, time, userId}),

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
 import { storeToken, storeRefreshToken, clearTokens, apiCall } from '../services/authService';
-import { IP_ADDRESS, PORT } from '@env';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 interface AuthProps {
   // authState?: {token: string | null; authenticated: boolean | null};
@@ -12,15 +12,13 @@ interface AuthProps {
 
 export const AuthContext = createContext<AuthProps | undefined>(undefined);
 
-const API_URL = `http://${IP_ADDRESS}:${PORT}/user/login`;
-
 export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState(null);
 
   const login = async (email: string, password: string) => {
     try {
       console.log("body: ", JSON.stringify({email, password}))
-        const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/login`, {
+        const response = await fetch(`${API_BASE_URL}/user/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({email, password}),
@@ -48,7 +46,7 @@ export const AuthProvider = ({ children }: any) => {
 
   const register = async (email: string, password: string, first: string, last: string) => {
     try {
-        const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/`, {
+        const response = await fetch(`${API_BASE_URL}/user/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({email, password, first, last}),
