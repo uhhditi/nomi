@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
-import { storeToken, storeRefreshToken, clearTokens, apiCall } from '../services/authService';
+import { storeToken, storeRefreshToken, clearTokens, getToken } from '../services/authService';
 import { API_BASE_URL } from '../utils/apiConfig';
 
 interface AuthProps {
@@ -18,29 +18,37 @@ export const AuthProvider = ({ children }: any) => {
 
   const login = async (email: string, password: string) => {
     try {
-      console.log("body: ", JSON.stringify({email, password}))
-        const response = await fetch(`${API_BASE_URL}/user/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({email, password}),
-          });
-    
-        if (!response.ok) {
-          throw new Error("invalid login")
-        } 
-    
-        const data = await response.json();
-        console.log("login user data", data.user);
-        setUser(data.user.user);
-        console.log("storing token");
+      console.log("body: ", JSON.stringify({email, password}));
+      const response = await fetch(`${API_BASE_URL}/user/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({email, password}),
+      });
 
-        console.log("access token type: ", typeof (data.user.accessToken));
-        console.log("refresh token type: ", typeof (data.user.refreshToken));
-        await storeToken(data.user.accessToken);
-        await storeRefreshToken(data.user.refreshToken);
-        return data.user;
-    } catch (error) {
+      const text = await response.text();
+      let data: { user?: { user?: any; accessToken?: string; refreshToken?: string }; message?: string } = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        console.error('Login response not JSON:', text?.slice(0, 200));
+        throw new Error(response.ok ? 'Invalid response from server' : 'Login failed. Try again.');
+      }
+
+      if (!response.ok) {
+        console.error('Login failed:', response.status, data);
+        throw new Error(data.message || 'Invalid email or password.');
+      }
+
+      console.log("login user data", data.user);
+      setUser(data.user?.user);
+      if (data.user?.accessToken) await storeToken(data.user.accessToken);
+      if (data.user?.refreshToken) await storeRefreshToken(data.user.refreshToken);
+      return data.user;
+    } catch (error: any) {
       console.error('Login error:', error);
+      if (error?.message?.includes('fetch') || error?.name === 'TypeError') {
+        throw new Error('Could not reach server. Check your connection.');
+      }
       throw error;
     }
   };
@@ -73,12 +81,15 @@ export const AuthProvider = ({ children }: any) => {
         }
         console.log("yay");
         setUser(data.user);
-        await storeToken(data.accessToken);
-        await storeRefreshToken(data.refreshToken);
+        if (data.accessToken) await storeToken(data.accessToken);
+        if (data.refreshToken) await storeRefreshToken(data.refreshToken);
         return data.user;
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
+      if (error?.message?.includes('fetch') || error?.name === 'TypeError') {
+        throw new Error('Could not reach server. Check your connection.');
+      }
       throw error;
     }
   };
@@ -90,7 +101,8 @@ export const AuthProvider = ({ children }: any) => {
 
   const updateUser = async (updates: { first?: string; last?: string; email?: string }) => {
     const token = await getToken();
-    const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/profile`, {
+    if (!token) throw new Error('Not authenticated');
+    const response = await fetch(`${API_BASE_URL}/user/profile`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(updates),

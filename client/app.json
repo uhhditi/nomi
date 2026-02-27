@@ -33,8 +33,6 @@
     "plugins": [
       "expo-secure-store",
       "@react-native-community/datetimepicker"
-    ]
-      "expo-secure-store"
     ],
     "extra": {
       "eas": {
