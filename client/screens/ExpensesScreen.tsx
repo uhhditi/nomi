@@ -281,25 +281,6 @@ export default function ExpensesScreen() {
           <Text style={styles.emptyText}>No recent transactions</Text>
         )}
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity onPress={() => {}}>
-          <Feather name="menu" size={20} color="#14141A" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}}>
-          <Feather name="grid" size={20} color="#14141A" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navHome} onPress={() => navigation.navigate('RoommateDashboard')}>
-          <Ionicons name="home" size={18} color="#FFFFFF" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}}>
-          <Ionicons name="person-circle-outline" size={22} color="#14141A" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => {}}>
-          <Ionicons name="people-outline" size={22} color="#14141A" />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -392,13 +373,4 @@ const styles = StyleSheet.create({
   transactionContent: { flex: 1 },
   transactionText: { fontSize: 14, fontFamily: 'Inter', fontWeight: '500', color: '#14141A', marginBottom: 4 },
   transactionTime: { fontSize: 12, fontFamily: 'Inter', fontWeight: '400', color: '#8E8E93' },
-  bottomBar: {
-    position: 'absolute', bottom: 8, left: 0, right: 0, height: 64,
-    backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: BORDER,
-    paddingHorizontal: 24, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-  },
-  navHome: {
-    width: 40, height: 40, borderRadius: 8,
-    backgroundColor: '#14141A', alignItems: 'center', justifyContent: 'center',
-  },
 });

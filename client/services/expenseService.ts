@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@env';
+import { API_BASE_URL } from '../utils/apiConfig';
 import { getToken } from './authService';
 
 const API_URL = `${API_BASE_URL}/expenses`;

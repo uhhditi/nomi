@@ -1,6 +1,6 @@
 import pg from 'pg';
-import dotenv from 'dotenv';
-dotenv.config();
+// Load dotenv only when available (e.g. local); on Vercel env vars are injected
+try { (await import('dotenv')).default.config(); } catch (_) {}
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,

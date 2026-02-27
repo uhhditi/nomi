@@ -6,9 +6,15 @@ import { verifyToken } from "../middlewares/validationMiddleware.js";
 
 const router = Router();
 
-router.post('/', UserController.createUser);
-// router.post('/', validateData(createUserSchema), UserController.createUser);
-router.post('/login', UserController.loginUser);
-router.post('/refresh-token', UserController.refreshToken);
-router.put('/profile', verifyToken, UserController.updateProfile);
+// Wrap async handlers so rejections are passed to error middleware
+const wrap = (fn) => (req, res, next) =>
+  Promise.resolve(fn(req, res, next)).catch(next);
+
+router.post("/", wrap(UserController.createUser));
+// router.post("/", validateData(createUserSchema), wrap(UserController.createUser));
+
+router.post("/login", wrap(UserController.loginUser));
+router.post("/refresh-token", wrap(UserController.refreshToken));
+router.put("/profile", verifyToken, wrap(UserController.updateProfile));
+
 export default router;

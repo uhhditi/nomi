@@ -212,7 +212,7 @@ export default function RoommateDashboardScreen() {
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Chores</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Rules' as never)}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => Alert.alert('Feature Coming Soon', 'This feature is coming soon!')}>
           <View style={styles.quickIcon}>
             <Feather name="list" size={20} color="#14141A" />
           </View>
@@ -287,25 +287,6 @@ export default function RoommateDashboardScreen() {
       })()}
 
       </ScrollView>
-
-      {/* Bottom nav */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity onPress={() => notImplemented('Menu')}>
-          <Feather name="menu" size={20} color="#14141A" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => notImplemented('Grid')}>
-          <Feather name="grid" size={20} color="#14141A" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navHome} onPress={() => navigation.navigate('Start' as never)}>
-          <Ionicons name="home" size={18} color="#FFFFFF" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => notImplemented('Profile')}>
-          <Ionicons name="person-circle-outline" size={22} color="#14141A" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => notImplemented('People')}>
-          <Ionicons name="people-outline" size={22} color="#14141A" />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -326,7 +307,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   scrollContent: {
-    paddingBottom: 88,
+    paddingBottom: 20,
   },
   headerRow: {
     flexDirection: 'row',
@@ -535,36 +516,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
     fontWeight: '500',
     color: '#4A4A55',
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 8,
-    left: 0,
-    right: 0,
-    height: 64,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: BORDER,
-    paddingHorizontal: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  navIcon: {
-    fontSize: 20,
-  },
-  navHome: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: '#14141A',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navHomeText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
   },
   groupSection: {
     flexDirection: 'row',

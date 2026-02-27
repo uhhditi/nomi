@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@env'
+import { API_BASE_URL } from '../utils/apiConfig';
 import * as SecureStore from 'expo-secure-store';
 
 

@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '@env'
+import { API_BASE_URL } from '../utils/apiConfig';
 import { useState, useContext } from 'react';
 import { apiCall, storeRefreshToken, storeToken } from './authService';
 

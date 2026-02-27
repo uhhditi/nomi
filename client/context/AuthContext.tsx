@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
-import { storeToken, storeRefreshToken, clearTokens, apiCall, getToken } from '../services/authService';
-import { IP_ADDRESS, PORT } from '@env';
+import { storeToken, storeRefreshToken, clearTokens, apiCall } from '../services/authService';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 interface AuthProps {
   // authState?: {token: string | null; authenticated: boolean | null};
@@ -13,15 +13,13 @@ interface AuthProps {
 
 export const AuthContext = createContext<AuthProps | undefined>(undefined);
 
-const API_URL = `http://${IP_ADDRESS}:${PORT}/user/login`;
-
 export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState(null);
 
   const login = async (email: string, password: string) => {
     try {
       console.log("body: ", JSON.stringify({email, password}))
-        const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/login`, {
+        const response = await fetch(`${API_BASE_URL}/user/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({email, password}),
@@ -49,30 +47,35 @@ export const AuthProvider = ({ children }: any) => {
 
   const register = async (email: string, password: string, first: string, last: string) => {
     try {
-        const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/`, {
+        const response = await fetch(`${API_BASE_URL}/user/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({email, password, first, last}),
         });
 
         console.log("Response status:", response.status);
-        const data = await response.json();
-       // const text = await response.text();
-       // console.log("Response text:", text);
+        const text = await response.text();
+        let data: { user?: any; accessToken?: string; refreshToken?: string; message?: string; errorCode?: string } = {};
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch {
+          console.error('Signup response not JSON:', text?.slice(0, 200));
+          throw new Error(response.ok ? 'Invalid response from server' : 'Signup failed. Try again.');
+        }
 
-          if (!response.ok) {
-            if (data.errorCode === "23505") {
-              alert("This email has an account associated with it. Please log in.");
-              return null;
-            }
-            console.error('Signup failed:', data);
-            throw new Error(data.message || 'Signup failed');
+        if (!response.ok) {
+          if (data.errorCode === "23505") {
+            alert("This email has an account associated with it. Please log in.");
+            return null;
           }
-          console.log("yay")
-          setUser(data.user);
-          await storeToken(data.accessToken);
-          await storeRefreshToken(data.refreshToken);
-          return data.user;
+          console.error('Signup failed:', data);
+          throw new Error(data.message || 'Signup failed');
+        }
+        console.log("yay");
+        setUser(data.user);
+        await storeToken(data.accessToken);
+        await storeRefreshToken(data.refreshToken);
+        return data.user;
 
     } catch (error) {
       console.error('Registration error:', error);
