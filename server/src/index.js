@@ -9,6 +9,8 @@ import { verifyToken } from './middlewares/validationMiddleware.js';
 import groupRoutes from './routes/groupRoutes.js';
 import choreRoutes from './routes/choreRoutes.js';
 import receiptRoutes from './routes/receiptRoutes.js';
+
+import groceryRoutes from './routes/groceryRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 
 const app = express();
@@ -22,6 +24,8 @@ app.use('/symptom', verifyToken, symptomRoutes);
 app.use('/groups', verifyToken, groupRoutes);
 app.use('/chores', verifyToken, choreRoutes);
 app.use('/receipts', receiptRoutes);
+
+app.use('/grocery', groceryRoutes);
 app.use('/expenses', expenseRoutes);
 
 app.listen(PORT, '0.0.0.0', () => {

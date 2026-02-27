@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -33,6 +33,13 @@ export default function ReceiptReviewScreen() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [groupId, setGroupId] = useState<number | null>(null);
+
+  // Editable copy of items
+  const [editableItems, setEditableItems] = useState(items.map(item => ({ ...item })));
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+
   const [selectedRoommates, setSelectedRoommates] = useState<Record<string, number[]>>(() => {
     const initial: Record<string, number[]> = {};
     items.forEach((item) => {
@@ -74,6 +81,37 @@ export default function ReceiptReviewScreen() {
     loadRoommates();
   }, [user?.id]);
 
+  const startEditing = (index: number) => {
+    setEditingIndex(index);
+    setEditName(editableItems[index].name);
+    setEditPrice(editableItems[index].price.toString());
+  };
+
+  const saveEdit = () => {
+    if (!editName.trim()) { Alert.alert('Error', 'Item name cannot be empty.'); return; }
+    const parsedPrice = parseFloat(editPrice);
+    if (isNaN(parsedPrice) || parsedPrice < 0) { Alert.alert('Error', 'Please enter a valid price.'); return; }
+
+    setEditableItems(prev => {
+      const updated = [...prev];
+      const oldName = updated[editingIndex!].name;
+      updated[editingIndex!] = { ...updated[editingIndex!], name: editName.trim(), price: parsedPrice };
+      // Migrate selected roommates to new name key if name changed
+      if (oldName !== editName.trim()) {
+        setSelectedRoommates(prevSel => {
+          const next = { ...prevSel };
+          next[editName.trim()] = next[oldName] || [];
+          delete next[oldName];
+          return next;
+        });
+      }
+      return updated;
+    });
+    setEditingIndex(null);
+  };
+
+  const cancelEdit = () => setEditingIndex(null);
+
   const toggleRoommate = (itemName: string, roommateId: number) => {
     setSelectedRoommates((prev) => {
       const current = prev[itemName] || [];
@@ -101,7 +139,7 @@ export default function ReceiptReviewScreen() {
     setSaving(true);
     try {
       // Create an expense for each item
-      const expensePromises = items.map(async (item) => {
+      const expensePromises = editableItems.map(async (item) => {
         const selectedUserIds = selectedRoommates[item.name] || [];
         
         // Calculate owed amount per person
@@ -171,16 +209,46 @@ export default function ReceiptReviewScreen() {
           </View>
         )}
 
-        {items.map((item, index) => (
+        {editableItems.map((item, index) => (
           <View key={index} style={styles.itemCard}>
             <View style={styles.itemHeader}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <View style={styles.itemDetails}>
-                {item.quantity !== undefined && item.quantity !== null && (
-                  <Text style={styles.itemDetail}>qty: {item.quantity}</Text>
-                )}
-                <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
-              </View>
+              {editingIndex === index ? (
+                <View style={styles.editRow}>
+                  <TextInput
+                    style={styles.editNameInput}
+                    value={editName}
+                    onChangeText={setEditName}
+                    placeholder="Item name"
+                    autoFocus
+                  />
+                  <TextInput
+                    style={styles.editPriceInput}
+                    value={editPrice}
+                    onChangeText={setEditPrice}
+                    keyboardType="decimal-pad"
+                    placeholder="0.00"
+                  />
+                  <TouchableOpacity onPress={saveEdit} style={styles.editActionBtn}>
+                    <Ionicons name="checkmark" size={20} color="#2E7D32" />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={cancelEdit} style={styles.editActionBtn}>
+                    <Ionicons name="close" size={20} color="#D32F2F" />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <>
+                  <Text style={styles.itemName}>{item.name}</Text>
+                  <View style={styles.itemDetails}>
+                    {item.quantity !== undefined && item.quantity !== null && (
+                      <Text style={styles.itemDetail}>qty: {item.quantity}</Text>
+                    )}
+                    <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+                    <TouchableOpacity onPress={() => startEditing(index)} style={styles.editIconBtn}>
+                      <Ionicons name="pencil" size={14} color="#7D60A3" />
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
             </View>
             <View style={styles.roommateRow}>
               {loading ? (
@@ -190,10 +258,10 @@ export default function ReceiptReviewScreen() {
               ) : (
                 roommates.map((roommate) => {
                   const isCurrentUser = roommate.id === user?.id;
-                  const displayName = isCurrentUser 
-                    ? 'you' 
+                  const displayName = isCurrentUser
+                    ? 'you'
                     : getRoommateDisplayName(roommate);
-                  
+
                   return (
                     <TouchableOpacity
                       key={roommate.id}
@@ -406,6 +474,40 @@ const styles = StyleSheet.create({
   },
   completeButtonDisabled: {
     opacity: 0.6,
+  },
+  editRow: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  editNameInput: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: 'Inter',
+    fontWeight: '500',
+    color: '#14141A',
+    borderBottomWidth: 1,
+    borderBottomColor: CTA,
+    paddingVertical: 2,
+  },
+  editPriceInput: {
+    width: 64,
+    fontSize: 14,
+    fontFamily: 'Inter',
+    fontWeight: '500',
+    color: '#14141A',
+    borderBottomWidth: 1,
+    borderBottomColor: CTA,
+    paddingVertical: 2,
+    textAlign: 'right',
+  },
+  editActionBtn: {
+    padding: 4,
+  },
+  editIconBtn: {
+    padding: 4,
+    marginLeft: 4,
   },
 });
 

@@ -96,6 +96,23 @@ export async function getExpensesByGroup(groupId: number): Promise<Expense[]> {
 }
 
 /**
+ * Mark a list of expense shares as paid/settled
+ */
+export async function markSharesPaid(shareIds: number[]): Promise<void> {
+  const token = await getToken();
+  if (!token) throw new Error('No authentication token found');
+  const response = await fetch(`${API_URL}/shares/paid`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ shareIds }),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+}
+
+/**
  * Get expenses by current user
  */
 export async function getExpensesByUser(): Promise<Expense[]> {

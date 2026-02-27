@@ -134,22 +134,46 @@ export const ExpenseShareModel = {
     return result.rows;
   },
 
-  async getByExpenseId(expenseId) {
-    const result = await db.query(`
-      SELECT 
+
+  /**
+   * Get shares for an expense, optionally filter by paid status.
+   * @param {number} expenseId
+   * @param {boolean|null} paid If null, return all. If true/false, filter by paid status.
+   */
+  async getByExpenseId(expenseId, paid = false) {
+    let query = `
+      SELECT
         es.share_id,
         es.expense_id,
         es.user_id,
         es.owed_amount,
+        es.paid,
         es.created_at,
         u.first,
         u.last,
         u.email
       FROM expense_shares es
       JOIN users u ON es.user_id = u.id
-      WHERE es.expense_id = $1
-    `, [expenseId]);
+      WHERE es.expense_id = $1`;
+    const params = [expenseId];
+    if (paid !== null) {
+      query += ' AND es.paid = $2';
+      params.push(paid);
+    }
+    const result = await db.query(query, params);
+    return result.rows;
+  },
 
+  /**
+   * Mark multiple shares as paid by their share IDs.
+   * @param {number[]} shareIds
+   */
+  async markBulkPaid(shareIds) {
+    if (!Array.isArray(shareIds) || shareIds.length === 0) return [];
+    const result = await db.query(
+      `UPDATE expense_shares SET paid = TRUE WHERE share_id = ANY($1) RETURNING *`,
+      [shareIds]
+    );
     return result.rows;
   },
 

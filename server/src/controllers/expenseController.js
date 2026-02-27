@@ -91,5 +91,19 @@ export const ExpenseController = {
       res.status(500).json({ error: error.message || 'Failed to delete expense' });
     }
   },
+
+  async markSharesPaid(req, res) {
+    try {
+      const { shareIds } = req.body;
+      if (!shareIds || !Array.isArray(shareIds) || shareIds.length === 0) {
+        return res.status(400).json({ error: 'shareIds array is required' });
+      }
+      const result = await ExpenseService.markSharesPaid(shareIds);
+      res.json(result);
+    } catch (error) {
+      console.error('Error marking shares as paid:', error);
+      res.status(500).json({ error: error.message || 'Failed to mark shares as paid' });
+    }
+  },
 };
 

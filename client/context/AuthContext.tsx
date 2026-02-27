@@ -8,6 +8,7 @@ interface AuthProps {
   register: ( email: string, password: string, first: string, last: string ) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<any>;
+  updateUser: (updates: { first?: string; last?: string; email?: string }) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthProps | undefined>(undefined);
@@ -87,8 +88,20 @@ export const AuthProvider = ({ children }: any) => {
     await clearTokens();
   };
 
+  const updateUser = async (updates: { first?: string; last?: string; email?: string }) => {
+    const token = await getToken();
+    const response = await fetch(`http://${IP_ADDRESS}:${PORT}/user/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) throw new Error('Failed to update profile');
+    const updatedUser = await response.json();
+    setUser((prev: any) => ({ ...prev, ...updatedUser }));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

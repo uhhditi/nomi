@@ -24,6 +24,9 @@ const upload = multer({
 // Process receipt image
 router.post('/process', verifyToken, upload.single('image'), ReceiptController.processReceiptImage);
 
+// Process receipt and add groceries to the group list
+router.post('/process-and-add-groceries', verifyToken, upload.single('image'), ReceiptController.processReceiptAndAddGroceries);
+
 export default router;
 
 

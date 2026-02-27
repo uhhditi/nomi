@@ -16,6 +16,7 @@ export default function RoommateDashboardScreen() {
   const [recentChore, setRecentChore] = useState<Chore | null>(null);
   const [choresToDoCount, setChoresToDoCount] = useState(0);
   const [totalOwed, setTotalOwed] = useState(0);
+  const [totalOwedToYou, setTotalOwedToYou] = useState(0);
   const [recentExpense, setRecentExpense] = useState<Expense | null>(null);
 
   const notImplemented = (label: string) => Alert.alert(label, 'Coming soon');
@@ -87,22 +88,30 @@ export default function RoommateDashboardScreen() {
         // Load expenses to calculate total owed and get most recent expense
         try {
           const expenses = await getExpensesByGroup(group.id);
-          
-          // Calculate total amount user owes (from expense_shares where user_id = current user)
+
+          // Calculate total amount user owes (shares where this user is the debtor)
+          // and total amount owed to user (shares on expenses they paid for)
           let total = 0;
+          let totalToYou = 0;
           expenses.forEach((expense: Expense) => {
             if (expense.shares) {
               expense.shares.forEach((share) => {
-                if (share.user_id === user.id) {
-                  const amount = typeof share.owed_amount === 'string' 
-                    ? parseFloat(share.owed_amount) 
-                    : (share.owed_amount || 0);
+                const amount = typeof share.owed_amount === 'string'
+                  ? parseFloat(share.owed_amount)
+                  : (share.owed_amount || 0);
+                // eslint-disable-next-line eqeqeq
+                if (share.user_id == user.id) {
                   total += amount;
+                }
+                // eslint-disable-next-line eqeqeq
+                if (expense.paid_by_user_id == user.id) {
+                  totalToYou += amount;
                 }
               });
             }
           });
-          setTotalOwed(Math.round(total * 100) / 100); // Round to 2 decimal places
+          setTotalOwed(Math.round(total * 100) / 100);
+          setTotalOwedToYou(Math.round(totalToYou * 100) / 100);
 
           // Get most recent expense (sorted by created_at DESC)
           const sortedExpenses = expenses
@@ -173,24 +182,29 @@ export default function RoommateDashboardScreen() {
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statCard}>
+          <Text style={styles.statValue}>${totalOwedToYou.toFixed(2)}</Text>
+          <Text style={styles.statLabel}>Owed to you</Text>
+        </View>
+        <View style={styles.statDivider} />
+        <View style={styles.statCard}>
           <Text style={styles.statValue}>{choresToDoCount}</Text>
-          <Text style={styles.statLabel}>Chores To-Do</Text>
+          <Text style={styles.statLabel}>Chores</Text>
         </View>
       </View>
       <View style={styles.statHorizontalDivider} />
       {/* Quick actions - 2 x 2 grid */}
       <View style={styles.quickGrid}>
-        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('ReceiptScanner' as never)}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Expenses' as never)}>
           <View style={styles.quickIcon}>
             <Ionicons name="add" size={20} color="#14141A" />
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Add Expense</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Expenses' as never)}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('GroceryList' as never)}>
           <View style={styles.quickIcon}>
-            <Ionicons name="wallet-outline" size={20} color="#14141A" />
+            <MaterialCommunityIcons name="cart-outline" size={20} color="#14141A" />
           </View>
-          <Text style={styles.quickLabel} numberOfLines={1}>View Expenses</Text>
+          <Text style={styles.quickLabel} numberOfLines={1}>Grocery List</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('ChoreTracker' as never)}>
           <View style={styles.quickIcon}>
@@ -204,17 +218,6 @@ export default function RoommateDashboardScreen() {
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Rules</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* AI Suggestions */}
-      <View style={styles.aiCard}>
-        <View style={styles.aiHeaderRow}>
-          <MaterialCommunityIcons name="robot" size={18} color="#14141A" style={{ marginRight: 6 }} />
-          <Text style={styles.aiTitle}>AI Suggestions</Text>
-        </View>
-        <Text style={styles.aiText}>
-          Coming soon
-        </Text>
       </View>
 
       {/* Recent Activity */}
@@ -349,7 +352,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
   },
   statCard: {
-    width: '46%',
+    width: '30%',
     backgroundColor: 'transparent',
     borderRadius: 0,
     paddingVertical: 4,
