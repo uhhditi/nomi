@@ -1,4 +1,4 @@
-import { IP_ADDRESS, PORT } from '@env'
+import { API_BASE_URL } from '@env'
 import * as SecureStore from 'expo-secure-store';
 
 
@@ -7,7 +7,7 @@ export async function getSymptoms() {
       // Get the access token 
       let accessToken = await SecureStore.getItemAsync('accessToken');
       
-      const response = await fetch(`http://${IP_ADDRESS}:${PORT}/symptom/`, {
+      const response = await fetch(`${API_BASE_URL}/symptom/`, {
           method: 'GET',
           headers: { 
               'Content-Type': 'application/json', 
@@ -34,7 +34,7 @@ export async function getSymptoms() {
 export async function addSymptom(name: string, date: Date, time: string, userId: number) {
     try {
       let accessToken = await SecureStore.getItemAsync('accessToken');
-      const response = await fetch(`http://${IP_ADDRESS}:${PORT}/symptom/add`, {
+      const response = await fetch(`${API_BASE_URL}/symptom/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` },
         body: JSON.stringify({name, date, time, userId}),

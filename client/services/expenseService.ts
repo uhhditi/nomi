@@ -1,7 +1,7 @@
-import { IP_ADDRESS, PORT } from '@env';
+import { API_BASE_URL } from '@env';
 import { getToken } from './authService';
 
-const API_URL = `http://${IP_ADDRESS}:${PORT}/expenses`;
+const API_URL = `${API_BASE_URL}/expenses`;
 
 export interface ExpenseShare {
   share_id: number;

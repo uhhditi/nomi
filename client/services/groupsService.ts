@@ -1,7 +1,7 @@
-import { IP_ADDRESS, PORT } from '@env';
+import { API_BASE_URL } from '@env';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = `http://${IP_ADDRESS}:${PORT}`;
+const API_URL = API_BASE_URL;
 
 async function getAuthHeaders() {
   const token = await SecureStore.getItemAsync('accessToken');

@@ -1,9 +1,9 @@
-import { IP_ADDRESS, PORT } from '@env';
+import { API_BASE_URL } from '@env';
 import { getToken } from './authService';
 
-const API_URL = `http://${IP_ADDRESS}:${PORT}/grocery`;
+const API_URL = `${API_BASE_URL}/grocery`;
 
-export async function getGroceryList(groupId) {
+export async function getGroceryList(groupId: number) {
   const token = await getToken();
   const res = await fetch(`${API_URL}/group/${groupId}`, {
     headers: { 'Authorization': `Bearer ${token}` },
@@ -12,7 +12,7 @@ export async function getGroceryList(groupId) {
   return res.json();
 }
 
-export async function getGrocerySuggestions(groupId) {
+export async function getGrocerySuggestions(groupId: number) {
   const token = await getToken();
   const res = await fetch(`${API_URL}/group/${groupId}/recurring-suggestions`, {
     headers: { 'Authorization': `Bearer ${token}` },
@@ -21,7 +21,7 @@ export async function getGrocerySuggestions(groupId) {
   return res.json();
 }
 
-export async function addGroceryItem(groupId, name, category) {
+export async function addGroceryItem(groupId: number, name: string, category: string) {
   const token = await getToken();
   const res = await fetch(`${API_URL}/`, {
     method: 'POST',
@@ -35,7 +35,7 @@ export async function addGroceryItem(groupId, name, category) {
   return res.json();
 }
 
-export async function updateGroceryItem(itemId, updates) {
+export async function updateGroceryItem(itemId: number, updates: Record<string, unknown>) {
   const token = await getToken();
   const res = await fetch(`${API_URL}/${itemId}`, {
     method: 'PUT',
@@ -49,7 +49,7 @@ export async function updateGroceryItem(itemId, updates) {
   return res.json();
 }
 
-export async function deleteGroceryItem(itemId) {
+export async function deleteGroceryItem(itemId: number) {
   const token = await getToken();
   const res = await fetch(`${API_URL}/${itemId}`, {
     method: 'DELETE',
@@ -59,7 +59,7 @@ export async function deleteGroceryItem(itemId) {
   return res.json();
 }
 
-export async function markGroceryPurchased(itemId) {
+export async function markGroceryPurchased(itemId: number) {
   const token = await getToken();
   const res = await fetch(`${API_URL}/${itemId}/purchased`, {
     method: 'PUT',
