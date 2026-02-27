@@ -186,11 +186,11 @@ export default function RoommateDashboardScreen() {
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Add Expense</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.quickCard} onPress={() => Alert.alert('Feature Coming Soon', 'This feature is coming soon!')}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Expenses' as never)}>
           <View style={styles.quickIcon}>
-            <MaterialCommunityIcons name="fridge" size={20} color="#14141A" />
+            <Ionicons name="wallet-outline" size={20} color="#14141A" />
           </View>
-          <Text style={styles.quickLabel} numberOfLines={1}>Fridge</Text>
+          <Text style={styles.quickLabel} numberOfLines={1}>View Expenses</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('ChoreTracker' as never)}>
           <View style={styles.quickIcon}>
