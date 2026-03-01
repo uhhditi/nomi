@@ -171,9 +171,9 @@ export default function ExpensesScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerIcon}>
-          <Text style={styles.dollarSign}>$</Text>
-        </View>
+        <TouchableOpacity style={styles.headerIcon} onPress={() => navigation.navigate('RoommateDashboard')} activeOpacity={0.7}>
+          <Ionicons name="arrow-back" size={22} color="#14141A" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Expenses</Text>
       </View>
 
@@ -302,7 +302,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center',
     marginRight: 12, borderWidth: 1, borderColor: BORDER,
   },
-  dollarSign: { fontSize: 18, fontWeight: '600', color: '#14141A', fontFamily: 'Inter' },
   headerTitle: { flex: 1, fontSize: 20, fontWeight: '600', color: '#14141A', fontFamily: 'Inter' },
   scrollContent: { paddingHorizontal: 20, paddingBottom: 88 },
   sectionTitle: {

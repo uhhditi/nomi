@@ -13,11 +13,10 @@ export default function RoommateDashboardScreen() {
   const { user } = auth || {};
   const [groupInfo, setGroupInfo] = useState<{ id: number; name: string } | null>(null);
   const [memberCount, setMemberCount] = useState(0);
-  const [recentChore, setRecentChore] = useState<Chore | null>(null);
+  const [recentActivities, setRecentActivities] = useState<Array<{ type: 'chore'; data: Chore } | { type: 'expense'; data: Expense }>>([]);
   const [choresToDoCount, setChoresToDoCount] = useState(0);
   const [totalOwed, setTotalOwed] = useState(0);
   const [totalOwedToYou, setTotalOwedToYou] = useState(0);
-  const [recentExpense, setRecentExpense] = useState<Expense | null>(null);
 
   const notImplemented = (label: string) => Alert.alert(label, 'Coming soon');
 
@@ -66,31 +65,21 @@ export default function RoommateDashboardScreen() {
         const members = await listMembers(group.id);
         setMemberCount(members.length);
 
-        // Load most recent chore and count incomplete chores
+        // Load chores and count incomplete
+        let chores: Chore[] = [];
         try {
-          const chores = await getChores(group.id);
-          // Sort by created_at DESC and take the most recent one
-          const sortedChores = chores
-            .sort((a, b) => {
-              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-              return dateB - dateA;
-            });
-          setRecentChore(sortedChores.length > 0 ? sortedChores[0] : null);
-          
-          // Count incomplete chores (where completed = false)
+          chores = await getChores(group.id);
           const incompleteChores = chores.filter(chore => !chore.completed);
           setChoresToDoCount(incompleteChores.length);
         } catch (error) {
-          console.error('Error loading recent chore:', error);
+          console.error('Error loading chores:', error);
         }
 
-        // Load expenses to calculate total owed and get most recent expense
+        // Load expenses, totals, and build top 3 recent activities
         try {
           const expenses = await getExpensesByGroup(group.id);
 
-          // Calculate total amount user owes (shares where this user is the debtor)
-          // and total amount owed to user (shares on expenses they paid for)
+          // Calculate total amount user owes and total owed to user
           let total = 0;
           let totalToYou = 0;
           expenses.forEach((expense: Expense) => {
@@ -113,17 +102,35 @@ export default function RoommateDashboardScreen() {
           setTotalOwed(Math.round(total * 100) / 100);
           setTotalOwedToYou(Math.round(totalToYou * 100) / 100);
 
-          // Get most recent expense (sorted by created_at DESC)
-          const sortedExpenses = expenses
-            .sort((a, b) => {
-              const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-              const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-              return dateB - dateA;
-            });
-          
-          setRecentExpense(sortedExpenses.length > 0 ? sortedExpenses[0] : null);
+          // Combined recent activity: chores + expenses, sorted by date desc, top 3
+          const choreItems = chores.map((c) => ({
+            type: 'chore' as const,
+            date: c.createdAt ? new Date(c.createdAt).getTime() : 0,
+            data: c,
+          }));
+          const expenseItems = expenses.map((e) => ({
+            type: 'expense' as const,
+            date: e.created_at ? new Date(e.created_at).getTime() : 0,
+            data: e,
+          }));
+          const combined = [...choreItems, ...expenseItems]
+            .sort((a, b) => b.date - a.date)
+            .slice(0, 3)
+            .map(({ type, data }) => (type === 'chore' ? { type: 'chore' as const, data } : { type: 'expense' as const, data }));
+          setRecentActivities(combined);
         } catch (error) {
           console.error('Error loading expenses:', error);
+          // If expenses fail, still show top 3 from chores only
+          const choreItems = chores.map((c) => ({
+            type: 'chore' as const,
+            date: c.createdAt ? new Date(c.createdAt).getTime() : 0,
+            data: c,
+          }));
+          const combined = choreItems
+            .sort((a, b) => b.date - a.date)
+            .slice(0, 3)
+            .map(({ data }) => ({ type: 'chore' as const, data }));
+          setRecentActivities(combined);
         }
       }
     } catch (error) {
@@ -220,71 +227,63 @@ export default function RoommateDashboardScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Recent Activity */}
+      {/* Recent Activity — top 3 most recent */}
       <Text style={styles.sectionTitle}>Recent Activity</Text>
-      {(() => {
-        // Determine which is more recent: expense or chore
-        const expenseTime = recentExpense?.created_at ? new Date(recentExpense.created_at).getTime() : 0;
-        const choreTime = recentChore?.createdAt ? new Date(recentChore.createdAt).getTime() : 0;
-        const showExpense = expenseTime >= choreTime && recentExpense;
-        const showChore = choreTime > expenseTime && recentChore;
-
-        if (showExpense) {
-          const paidByName = recentExpense.first && recentExpense.last
-            ? `${recentExpense.first} ${recentExpense.last}`
-            : recentExpense.email?.split('@')[0] || 'Someone';
-          
-          return (
-            <View style={styles.activityCard}>
-              <View style={styles.activityRow}>
-                <View style={styles.activityIcon}>
-                  <Ionicons name="cash" size={18} color="#14141A" />
-                </View>
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={styles.activityText}>
-                    {paidByName} added {recentExpense.name}
-                  </Text>
-                  <Text style={styles.activitySub}>
-                    {formatRelativeTime(recentExpense.created_at)}
-                  </Text>
+      {recentActivities.length === 0 ? (
+        <View style={styles.activityCard}>
+          <View style={styles.activityRow}>
+            <View style={styles.activityIcon}>
+              <Ionicons name="checkmark-done" size={18} color="#14141A" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.activityText}>No recent activity</Text>
+              <Text style={styles.activitySub}>Create an expense or chore to see activity</Text>
+            </View>
+          </View>
+        </View>
+      ) : (
+        recentActivities.map((item, index) => {
+          if (item.type === 'expense') {
+            const paidByName = item.data.first && item.data.last
+              ? `${item.data.first} ${item.data.last}`
+              : item.data.email?.split('@')[0] || 'Someone';
+            return (
+              <View key={`expense-${item.data.expense_id}-${index}`} style={styles.activityCard}>
+                <View style={styles.activityRow}>
+                  <View style={styles.activityIcon}>
+                    <Ionicons name="cash" size={18} color="#14141A" />
+                  </View>
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={styles.activityText}>
+                      {paidByName} added {item.data.name}
+                    </Text>
+                    <Text style={styles.activitySub}>
+                      {formatRelativeTime(item.data.created_at)}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          );
-        } else if (showChore) {
+            );
+          }
           return (
-            <View style={styles.activityCard}>
-              <View style={styles.activityRow}>
-                <View style={styles.activityIcon}>
-                  <Ionicons name="checkmark-done" size={18} color="#14141A" />
-                </View>
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={styles.activityText}>
-                    {recentChore.title} by {formatDueDate(recentChore.dueDate)}
-                  </Text>
-                  <Text style={styles.activitySub}>
-                    {formatRelativeTime(recentChore.createdAt)}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          );
-        } else {
-          return (
-            <View style={styles.activityCard}>
+            <View key={`chore-${item.data.choreId ?? index}`} style={styles.activityCard}>
               <View style={styles.activityRow}>
                 <View style={styles.activityIcon}>
                   <Ionicons name="checkmark-done" size={18} color="#14141A" />
                 </View>
                 <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={styles.activityText}>No recent activity</Text>
-                  <Text style={styles.activitySub}>Create an expense or chore to see activity</Text>
+                  <Text style={styles.activityText}>
+                    {item.data.title} by {formatDueDate(item.data.dueDate)}
+                  </Text>
+                  <Text style={styles.activitySub}>
+                    {formatRelativeTime(item.data.createdAt)}
+                  </Text>
                 </View>
               </View>
             </View>
           );
-        }
-      })()}
+        })
+      )}
 
       </ScrollView>
     </View>

@@ -268,7 +268,7 @@ export default function ChoreTrackerScreen() {
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#7D60A3" />
+        <ActivityIndicator size="large" color="#3F3F96" />
         <Text style={{ marginTop: 16, color: '#666' }}>Loading chores...</Text>
       </View>
     );
@@ -467,6 +467,8 @@ export default function ChoreTrackerScreen() {
   );
 }
 
+const DASHBOARD_PURPLE = '#3F3F96';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -524,7 +526,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   dayButtonSelected: {
-    backgroundColor: '#C9C9EE',
+    backgroundColor: DASHBOARD_PURPLE,
   },
   dayText: {
     fontSize: 12,
@@ -533,7 +535,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   dayTextSelected: {
-    color: '#7D60A3',
+    color: DASHBOARD_PURPLE,
     fontWeight: '600',
   },
   dayDate: {
@@ -542,11 +544,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
   },
   dayDateSelected: {
-    color: '#7D60A3',
+    color: DASHBOARD_PURPLE,
     fontWeight: '600',
   },
   addChoreButton: {
-    backgroundColor: '#C9C9EE',
+    backgroundColor: DASHBOARD_PURPLE,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -743,8 +745,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   roommateButtonSelected: {
-    backgroundColor: '#C9C9EE',
-    borderColor: '#C9C9EE',
+    backgroundColor: DASHBOARD_PURPLE,
+    borderColor: DASHBOARD_PURPLE,
   },
   roommateButtonText: {
     fontSize: 14,
@@ -764,7 +766,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter',
   },
   saveButton: {
-    backgroundColor: '#C9C9EE',
+    backgroundColor: DASHBOARD_PURPLE,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
