@@ -200,7 +200,7 @@ export default function RoommateDashboardScreen() {
           </View>
           <Text style={styles.quickLabel} numberOfLines={1}>Add Expense</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('GroceryList' as never)}>
+        <TouchableOpacity style={styles.quickCard} onPress={() => Alert.alert('Coming Soon', 'Grocery list is coming soon!')}>
           <View style={styles.quickIcon}>
             <MaterialCommunityIcons name="cart-outline" size={20} color="#14141A" />
           </View>
