@@ -37,7 +37,8 @@
     "extra": {
       "eas": {
         "projectId": "61249191-81ee-47bf-ae34-9fb1465fbfe4"
-      }
+      },
+      "apiUrl": "https://nomi-cyan.vercel.app"
     }
   }
 }
