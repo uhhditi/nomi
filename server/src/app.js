@@ -1,6 +1,8 @@
 import express from "express";
-// Load dotenv only when available (e.g. local); on Vercel env vars are injected
-try { await import("dotenv/config"); } catch (_) {}
+// On Vercel env vars are injected; locally load dotenv (skip import on Vercel so we never require the package)
+if (typeof process !== "undefined" && !process.env.VERCEL) {
+  try { await import("dotenv/config"); } catch (_) {}
+}
 import cors from "cors";
 
 import logsRoutes from "./routes/logsRoutes.js";
