@@ -67,8 +67,11 @@ export const AuthProvider = ({ children }: any) => {
         try {
           data = text ? JSON.parse(text) : {};
         } catch {
-          console.error('Signup response not JSON:', text?.slice(0, 200));
-          throw new Error(response.ok ? 'Invalid response from server' : 'Signup failed. Try again.');
+          console.error('Signup response not JSON:', response.status, text?.slice(0, 300));
+          if (!response.ok) {
+            throw new Error('Server error during signup. Check your connection and try again.');
+          }
+          throw new Error('Invalid response from server.');
         }
 
         if (!response.ok) {
@@ -76,8 +79,9 @@ export const AuthProvider = ({ children }: any) => {
             alert("This email has an account associated with it. Please log in.");
             return null;
           }
-          console.error('Signup failed:', data);
-          throw new Error(data.message || 'Signup failed');
+          const msg = data.message || 'Signup failed';
+          console.error('Signup failed:', response.status, data);
+          throw new Error(msg);
         }
         console.log("yay");
         setUser(data.user);

@@ -1,29 +1,30 @@
 import { IP_ADDRESS, PORT } from '@env';
 
 /**
- * Builds the API base URL, handling both local dev and Vercel production.
- * - Local: http://10.2.199.6:3000
- * - Vercel: https://your-app.vercel.app (no port)
- * IP_ADDRESS can be: hostname (nomi-cyan.vercel.app) or full URL (https://nomi-cyan.vercel.app/)
+ * Builds the API base URL.
+ * - EAS/TestFlight: use EXPO_PUBLIC_API_URL (set in EAS dashboard for production builds).
+ * - Local: use .env IP_ADDRESS and PORT (or EXPO_PUBLIC_API_URL if set).
  */
 export const getApiBaseUrl = (): string => {
+  // EAS builds: .env is not in the repo, so use EXPO_PUBLIC_* set in EAS Environment Variables
+  const explicit = (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_API_URL) || '';
+  if (explicit) {
+    return explicit.replace(/\/+$/, '');
+  }
+
   let address = (IP_ADDRESS ?? '').trim();
   const port = PORT?.toString().trim() || '';
-  
-  // If they passed a full URL (starts with http), normalize and return (no double https)
+  if (!address) return '';
+
+  // Full URL (starts with http)
   if (address.startsWith('https://') || address.startsWith('http://')) {
-    address = address.replace(/\/+$/, ''); // strip trailing slashes
-    return address;
+    return address.replace(/\/+$/, '');
   }
-  
-  // If it's a Vercel hostname or port is 443, use HTTPS and omit port
-  const isVercel = address.includes('.vercel.app') || port === '443';
-  
-  if (isVercel) {
+  // Vercel hostname or port 443
+  if (address.includes('.vercel.app') || port === '443') {
     return `https://${address}`;
   }
-  
-  // For local dev, use HTTP with port
+  // Local dev
   return `http://${address}:${port}`;
 };
 
